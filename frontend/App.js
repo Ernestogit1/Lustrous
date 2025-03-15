@@ -1,12 +1,20 @@
+import 'react-native-gesture-handler';
 import { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, SafeAreaView } from 'react-native';
 import { useFonts } from 'expo-font';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
+import { Provider as PaperProvider } from 'react-native-paper';
+
 import HomeScreen from './src/screens/HomeScreen';
+import AdminSideBar from './src/components/AdminSideBar';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
+const Stack = createNativeStackNavigator();
+
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -30,10 +38,19 @@ export default function App() {
   }
 
   return (
+    <PaperProvider>
+
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
-      <StatusBar style="auto" />
-      <HomeScreen />
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
+          <Stack.Screen name="Admin" component={AdminSideBar} />
+        </Stack.Navigator>
+      </NavigationContainer>
     </SafeAreaView>
+    </PaperProvider>
+
   );
 }
 
