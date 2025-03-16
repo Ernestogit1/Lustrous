@@ -1,154 +1,139 @@
-import React, { useState } from 'react';
-import { ScrollView, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { TextInput, Button, Title, Menu } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, ScrollView, Image, Alert } from 'react-native';
+import { Button, TextInput, HelperText } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import { createProduct } from '../../../redux/actions/product.Actions';
 import * as ImagePicker from 'expo-image-picker';
-import axios from 'axios';
-import { API_URL } from '@env';
+import { Camera } from 'expo-camera';
+import { Dropdown } from 'react-native-element-dropdown';
+
+const categories = [
+  { label: 'Lip Products', value: 'Lip Products' },
+  { label: 'Foundation', value: 'Foundation' },
+  { label: 'Palette', value: 'Palette' },
+  { label: 'Blush', value: 'Blush' },
+  { label: 'Tools', value: 'Tools' }
+];
 
 export default function ProductCreate({ navigation }) {
   const [name, setName] = useState('');
   const [category, setCategory] = useState('');
   const [stock, setStock] = useState('');
   const [images, setImages] = useState([]);
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [showDropDown, setShowDropDown] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState(null);
+  
+  const dispatch = useDispatch();
+  const { loading, success, error } = useSelector(state => state.productCreate);
 
-  const categories = ['Lip Products', 'Foundation', 'Palette', 'Blush', 'Tools'];
+  // ✅ Request permissions for camera and media library
+  useEffect(() => {
+    (async () => {
+      const { status: cameraStatus } = await Camera.requestCameraPermissionsAsync();
+      setCameraPermission(cameraStatus === 'granted');
 
-  // Function to handle image selection
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+      const { status: mediaStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (mediaStatus !== 'granted') {
+        Alert.alert('Permission Required', 'Please allow access to media library.');
+      }
+    })();
+  }, []);
+
+  // ✅ Handle selecting images from gallery
+  const handleImagePick = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsMultipleSelection: true,
       selectionLimit: 5,
-      aspect: [4, 3],
+    });
+
+    if (!result.canceled) {
+      setImages([...images, ...result.assets.map(asset => asset.uri)].slice(0, 5));
+    }
+  };
+
+  // ✅ Handle capturing images from camera
+  const handleCameraCapture = async () => {
+    if (!cameraPermission) {
+      Alert.alert('Permission Denied', 'Camera access is required.');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
       quality: 1,
     });
 
     if (!result.canceled) {
-      setImages([...images, ...result.assets.slice(0, 5 - images.length)]);
+      setImages([...images, result.assets[0].uri].slice(0, 5));
     }
   };
 
-  // Function to remove selected images
-  const removeImage = (index) => {
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
-  };
+  // ✅ Ensure form data is sent correctly
+  const handleSubmit = () => {
+    if (!name || !category || stock <= 0 || images.length === 0) {
+      alert('Please fill all fields and select at least one image.');
+      return;
+    }
 
-  const handleCreate = async () => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('category', category);
     formData.append('stock', stock);
 
-    images.forEach((image, index) => {
+    images.forEach((imageUri, index) => {
       formData.append('images', {
-        uri: image.uri,
+        uri: imageUri,
         type: 'image/jpeg',
         name: `product-${index}.jpg`,
       });
     });
 
-    try {
-      await axios.post(`${API_URL}/api/products/create`, formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      });
-      navigation.goBack();
-    } catch (err) {
-      console.log(err);
-    }
+    dispatch(createProduct(formData));
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <Title>Create Product</Title>
-
-      {/* Product Name Input */}
-      <TextInput 
-        label="Product Name" 
-        value={name} 
-        onChangeText={setName} 
-        style={styles.input} 
+    <ScrollView contentContainerStyle={styles.container}>
+      <TextInput label="Product Name" value={name} onChangeText={setName} style={styles.input} />
+      
+      {/* ✅ Fixed Dropdown */}
+            <Dropdown
+        data={categories}
+        labelField="label"
+        valueField="value"
+        placeholder="Select Category"
+        value={category}
+        onChange={item => setCategory(item.value)}
+        style={styles.dropdown}
       />
 
-      {/* Category Dropdown */}
-      <Menu
-        visible={menuVisible}
-        onDismiss={() => setMenuVisible(false)}
-        anchor={
-          <TouchableOpacity style={styles.dropdown} onPress={() => setMenuVisible(true)}>
-            <TextInput 
-              label="Category" 
-              value={category} 
-              editable={false} 
-              style={styles.input} 
-            />
-          </TouchableOpacity>
-        }>
-        {categories.map((item, index) => (
-          <Menu.Item key={index} title={item} onPress={() => { setCategory(item); setMenuVisible(false); }} />
-        ))}
-      </Menu>
 
-      {/* Stock Input */}
       <TextInput 
         label="Stock" 
         value={stock} 
-        keyboardType="numeric" 
         onChangeText={setStock} 
+        keyboardType="numeric" 
         style={styles.input} 
       />
 
-      {/* Image Upload Section */}
-      <Button mode="outlined" onPress={pickImage} style={styles.uploadButton}>
-        Select Images (Max: 5)
-      </Button>
+      <Button onPress={handleImagePick}>Select Images (Max 5)</Button>
+      <Button onPress={handleCameraCapture}>Capture Image</Button>
 
-      <ScrollView horizontal>
-        {images.map((image, index) => (
-          <View key={index} style={styles.imageContainer}>
-            <Image source={{ uri: image.uri }} style={styles.image} />
-            <TouchableOpacity onPress={() => removeImage(index)} style={styles.removeButton}>
-              <Title style={styles.removeButtonText}>X</Title>
-            </TouchableOpacity>
-          </View>
-        ))}
-      </ScrollView>
+      <View style={styles.imageContainer}>
+        {images.map((img, index) => <Image key={index} source={{ uri: img }} style={styles.image} />)}
+      </View>
 
-      {/* Submit Button */}
-      <Button mode="contained" onPress={handleCreate} style={styles.submitButton}>
-        Create Product
-      </Button>
+      <Button mode="contained" loading={loading} onPress={handleSubmit}>Create Product</Button>
+      {error && <HelperText type="error">{error}</HelperText>}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  input: { marginBottom: 10 },
-  dropdown: { marginBottom: 10 },
-  uploadButton: { marginBottom: 10 },
-  imageContainer: {
-    position: 'relative',
-    marginRight: 10,
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  removeButton: {
-    position: 'absolute',
-    top: 5,
-    right: 5,
-    backgroundColor: 'red',
-    borderRadius: 50,
-    padding: 5,
-  },
-  removeButtonText: {
-    color: 'white',
-    fontSize: 12,
-  },
-  submitButton: { marginTop: 20 },
+  container: { padding: 20 },
+  input: { marginBottom: 15 },
+  dropdown: { marginBottom: 15 },
+  imageContainer: { flexDirection: 'row', flexWrap: 'wrap' },
+  image: { width: 70, height: 70, margin: 5 },
 });

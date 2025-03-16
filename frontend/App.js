@@ -7,6 +7,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
+import { Provider } from 'react-redux';
+import store from './src/redux/store/product.Store';
 
 import HomeScreen from './src/screens/HomeScreen';
 import AdminSideBar from './src/components/AdminSideBar';
@@ -38,6 +40,9 @@ export default function App() {
   }
 
   return (
+
+    <Provider store={store}>
+
     <PaperProvider>
 
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
@@ -50,6 +55,7 @@ export default function App() {
       </NavigationContainer>
     </SafeAreaView>
     </PaperProvider>
+    </Provider>
 
   );
 }
