@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, SafeAreaView, ImageBackground, Dimensions, Image, Animated, FlatList } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -14,7 +15,7 @@ const COLORS = {
 };
 
 const HomeScreen = () => {
-
+  const navigation = useNavigation();
   const [currentIndex, setCurrentIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const flatListRef = useRef(null);
@@ -138,7 +139,10 @@ const HomeScreen = () => {
             <TouchableOpacity style={styles.iconButton}>
               <Ionicons name="heart-outline" size={22} color={COLORS.darkPurple} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
+            <TouchableOpacity 
+              style={styles.iconButton}
+              onPress={() => navigation.navigate('Register')}
+            >
               <Ionicons name="person-outline" size={22} color={COLORS.darkPurple} />
             </TouchableOpacity>
           </View>

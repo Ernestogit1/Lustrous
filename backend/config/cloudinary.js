@@ -21,6 +21,14 @@ const storage = new CloudinaryStorage({
   },
 });
 
-const upload = multer({ storage });
+const avatarStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'avatars', // Ensure images are stored in the 'avatars' folder
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+  },
+});
+
+const upload = multer({ storage, avatarStorage });
 
 module.exports = { cloudinary, upload };

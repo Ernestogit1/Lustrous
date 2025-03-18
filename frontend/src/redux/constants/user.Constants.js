@@ -1,0 +1,18 @@
+// Registration Constants
+export const REGISTER_USER_REQUEST = 'REGISTER_USER_REQUEST';
+export const REGISTER_USER_SUCCESS = 'REGISTER_USER_SUCCESS';
+export const REGISTER_USER_FAIL = 'REGISTER_USER_FAIL';
+export const REGISTER_USER_RESET = 'REGISTER_USER_RESET';
+
+// // Google Sign-In Constants
+// export const GOOGLE_SIGNIN_REQUEST = 'GOOGLE_SIGNIN_REQUEST';
+// export const GOOGLE_SIGNIN_SUCCESS = 'GOOGLE_SIGNIN_SUCCESS';
+// export const GOOGLE_SIGNIN_FAIL = 'GOOGLE_SIGNIN_FAIL';
+
+// Login Constants
+export const USER_LOGIN_REQUEST = 'USER_LOGIN_REQUEST';
+export const USER_LOGIN_SUCCESS = 'USER_LOGIN_SUCCESS';
+export const USER_LOGIN_FAIL = 'USER_LOGIN_FAIL';
+
+// Logout Constants
+export const USER_LOGOUT = 'USER_LOGOUT';
