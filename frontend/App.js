@@ -7,16 +7,72 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
-import { Provider } from 'react-redux';
-import store from './src/redux/store/product.Store';
 
+import { Provider } from 'react-redux';
+import { useSelector } from "react-redux";
+
+
+// store
+ import adminstore from './src/redux/store/Admin.Store';
+ import authStore from "./src/redux/store/Auth.Store";  // User store
+
+// outside screens
 import HomeScreen from './src/screens/HomeScreen';
+import RegisterScreen from "./src/screens/RegisterScreen";
+//user screens
+
+//admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
-const Stack = createNativeStackNavigator();
 
+const Stack = createNativeStackNavigator();
+const AdminStack = createNativeStackNavigator();
+const UserStack = createNativeStackNavigator();
+const AuthStack = createNativeStackNavigator();
+
+// auth side 
+
+function AuthNavigator() {
+  return (
+    <AuthStack.Navigator screenOptions={{ headerShown: false }}>
+      <AuthStack.Screen name="Home" component={HomeScreen} />
+      <AuthStack.Screen name="Register" component={RegisterScreen} />
+      {/* <AuthStack.Screen name="Login" component={LoginScreen} /> */}
+    </AuthStack.Navigator>
+  );
+}
+// user side
+function UserNavigator() {
+  return (
+    <UserStack.Navigator screenOptions={{ headerShown: false }}>
+      {/* <UserStack.Screen name="UserDashboard" component={UserDashboard} /> */}
+    </UserStack.Navigator>
+  );
+}
+
+//admin side
+
+function AdminNavigator() {
+  return (
+    <AdminStack.Navigator screenOptions={{ headerShown: false }}>
+      <AdminStack.Screen name="AdminHome" component={AdminSideBar} />
+    </AdminStack.Navigator>
+  );
+}
+
+function MainNavigator() {
+  const userInfo = useSelector((state) => state.user?.userInfo);
+  const isAdmin = userInfo?.isAdmin || false;
+
+  return (
+    <NavigationContainer>
+      <StatusBar style="auto" />
+      {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserNavigator />}
+    </NavigationContainer>
+  );
+}
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -38,26 +94,16 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-
   return (
-
-    <Provider store={store}>
-
-    <PaperProvider>
-
-    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
-      <NavigationContainer>
-        <StatusBar style="auto" />
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          {/* <Stack.Screen name="Home" component={HomeScreen} /> */}
-          <Stack.Screen name="Admin" component={AdminSideBar} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </SafeAreaView>
-    </PaperProvider>
+    <Provider store={authStore}>
+      <PaperProvider>
+        <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+          <MainNavigator />
+        </SafeAreaView>
+      </PaperProvider>
     </Provider>
-
   );
+
 }
 
 const styles = StyleSheet.create({
