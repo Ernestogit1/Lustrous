@@ -8,9 +8,9 @@ const UserSchema = new mongoose.Schema(
     password: { type: String, required: true, default: "firebase-manage" }, // Handled by Firebase
     phoneNumber: { type: String, required: true },
     address: { type: String },
-    avatar: { type: String, default: "" }, // Cloudinary URL
+    avatar: { type: String, default: '' }, // Cloudinary URL
     isAdmin: { type: Boolean, default: false }, // 0: User, 1: Admin
-    fcmToken: { type: String, default: "" }, // Push Notification Token
+    fcmToken: { type: String, default: '' }, // Push Notification Token
   },
   { timestamps: true }
 );

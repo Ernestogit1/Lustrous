@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 const RegisterScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { loading, error } = useSelector((state) => state.userRegister);
+  const { loading, error, success } = useSelector((state) => state.userRegister)
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -40,6 +40,14 @@ const RegisterScreen = () => {
       }
     })();
   }, []);
+
+
+  useEffect(() => {
+    if (success) {
+      Alert.alert("Success", "Registration successful! You can now log in.");
+      navigation.navigate("Login"); // 🔥 Redirect to LoginScreen
+    }
+  }, [success]);
 
   // Function to open camera and take photo
   const takePhoto = async () => {
@@ -100,7 +108,7 @@ const RegisterScreen = () => {
       const filename = avatar.split("/").pop();
       const match = /\.(\w+)$/.exec(filename);
       const type = match ? `image/${match[1]}` : "image/jpeg";
-
+    
       formData.append("avatar", {
         uri: avatar,
         name: filename,

@@ -16,11 +16,12 @@ import { useSelector } from "react-redux";
  import adminstore from './src/redux/store/Admin.Store';
  import authStore from "./src/redux/store/Auth.Store";  // User store
 
-// outside screens
+// auth screens
 import HomeScreen from './src/screens/HomeScreen';
 import RegisterScreen from "./src/screens/RegisterScreen";
+import LoginScreen from "./src/screens/LoginScreen";
 //user screens
-
+import UserScreen from './src/screens/client/UserScreen';
 //admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
@@ -39,7 +40,9 @@ function AuthNavigator() {
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Home" component={HomeScreen} />
       <AuthStack.Screen name="Register" component={RegisterScreen} />
-      {/* <AuthStack.Screen name="Login" component={LoginScreen} /> */}
+      <AuthStack.Screen name="Login" component={LoginScreen} />
+      {/* <AuthStack.Screen name="UserHome" component={UserScreen} /> */}
+
     </AuthStack.Navigator>
   );
 }
@@ -47,7 +50,7 @@ function AuthNavigator() {
 function UserNavigator() {
   return (
     <UserStack.Navigator screenOptions={{ headerShown: false }}>
-      {/* <UserStack.Screen name="UserDashboard" component={UserDashboard} /> */}
+      <UserStack.Screen name="UserHome" component={UserScreen} />
     </UserStack.Navigator>
   );
 }
@@ -63,7 +66,7 @@ function AdminNavigator() {
 }
 
 function MainNavigator() {
-  const userInfo = useSelector((state) => state.user?.userInfo);
+  const userInfo = useSelector((state) => state.userLogin.userInfo);  // ✅ FIX: Ensure correct state selection
   const isAdmin = userInfo?.isAdmin || false;
 
   return (
@@ -73,6 +76,7 @@ function MainNavigator() {
     </NavigationContainer>
   );
 }
+
 
 export default function App() {
   const [fontsLoaded] = useFonts({
