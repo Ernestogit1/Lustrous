@@ -6,11 +6,17 @@ import {
   TouchableOpacity,
   Alert,
   ActivityIndicator,
-  StyleSheet,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser} from "../redux/actions/auth.Actions";
+import { loginUser } from "../redux/actions/auth.Actions";
 import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import styles, { COLORS } from "./style/LoginScreen.styles";
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -19,7 +25,7 @@ const LoginScreen = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [showPassword, setShowPassword] = useState(false);
 
   // ✅ Redirect after successful login
   useEffect(() => {
@@ -31,9 +37,6 @@ const LoginScreen = () => {
     }
   }, [userInfo]);
 
-
-
-
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert("Error", "Please fill in both email and password.");
@@ -42,82 +45,90 @@ const LoginScreen = () => {
     dispatch(loginUser(email, password));
   };
 
-
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Login</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <LinearGradient colors={[COLORS.lightPink, '#FFF']} style={styles.gradientBackground}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.darkPurple} />
+          </TouchableOpacity>
+        </View>
 
-      <TextInput
-        placeholder="Email Address"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
+        <ScrollView contentContainerStyle={styles.content}>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.welcomeText}>Sign in to access your account</Text>
+          
+          {/* Input Fields with Icons */}
+          <View style={styles.inputContainer}>
+            <Ionicons name="mail-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+            <TextInput 
+              placeholder="Email Address" 
+              keyboardType="email-address" 
+              value={email} 
+              onChangeText={setEmail} 
+              style={styles.input} 
+              autoCapitalize="none"
+            />
+          </View>
+          
+          <View style={styles.inputContainer}>
+            <Ionicons name="lock-closed-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+            <TextInput 
+              placeholder="Password" 
+              secureTextEntry={!showPassword} 
+              value={password} 
+              onChangeText={setPassword} 
+              style={styles.input} 
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? "eye-off-outline" : "eye-outline"}
+                size={20}
+                color="#999"
+              />
+            </TouchableOpacity>
+          </View>
+{/* 
+          <View style={styles.forgotPasswordContainer}>
+            <TouchableOpacity>
+              <Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+            </TouchableOpacity>
+          </View> */}
 
-      <TextInput
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={styles.input}
-      />
+          {/* Error Handling */}
+          {error && <Text style={styles.errorText}>{error}</Text>}
 
-      {error && <Text style={styles.errorText}>{error}</Text>}
+          {/* Login Button */}
+          <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Sign In</Text>
+            )}
+          </TouchableOpacity>
 
-     
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
 
-      <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Login</Text>
-        )}
-      </TouchableOpacity>
-
-        
-    </View>
+          {/* Register Link */}
+          <View style={styles.registerLinkContainer}>
+            <Text style={styles.registerText}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <Text style={styles.registerLink}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </LinearGradient>
+    </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-    width: "100%",
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  errorText: {
-    color: "red",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-});
 
 export default LoginScreen;

@@ -27,11 +27,13 @@ const UserSchema = new mongoose.Schema(
       required: true 
     },
     address: { 
-      type: String 
+      type: String ,
+      required: true
     },
     avatar: {
        type: String, 
-       default: ''
+       default: '',
+       required: true
        }, 
     isAdmin: {
        type: Boolean, 

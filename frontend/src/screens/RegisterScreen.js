@@ -7,6 +7,9 @@ import {
   Alert,
   ActivityIndicator,
   Image,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser } from "../redux/actions/auth.Actions";
@@ -14,6 +17,8 @@ import * as ImagePicker from "expo-image-picker";
 import { Camera } from "expo-camera";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import styles, { COLORS } from "./style/RegisterScreen.styles";
 
 const RegisterScreen = () => {
   const dispatch = useDispatch();
@@ -27,6 +32,7 @@ const RegisterScreen = () => {
   const [address, setAddress] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [cameraPermission, setCameraPermission] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Request permissions for camera and media library
   useEffect(() => {
@@ -120,65 +126,137 @@ const RegisterScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>Register</Text>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      <LinearGradient colors={[COLORS.lightPink, '#FFF']} style={styles.gradientBackground}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.darkPurple} />
+          </TouchableOpacity>
+        </View>
 
-      {/* Avatar Upload Section */}
-      <TouchableOpacity onPress={() => Alert.alert("Upload Photo", "Choose an option", [
-        { text: "Camera", onPress: takePhoto },
-        { text: "Gallery", onPress: pickImage },
-        { text: "Cancel", style: "cancel" }
-      ])}>
-        {avatar ? (
-          <Image source={{ uri: avatar }} style={{ width: 100, height: 100, borderRadius: 50 }} />
-        ) : (
-          <View style={{ width: 100, height: 100, backgroundColor: "#ddd", justifyContent: "center", alignItems: "center", borderRadius: 50 }}>
-            <Ionicons name="camera" size={40} color="#555" />
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Sign Up</Text>
+            
+            {/* Avatar Upload Section */}
+            <TouchableOpacity 
+              style={styles.avatarContainer} 
+              onPress={() => Alert.alert("Upload Photo", "Choose an option", [
+                { text: "Camera", onPress: takePhoto },
+                { text: "Gallery", onPress: pickImage },
+                { text: "Cancel", style: "cancel" }
+              ])}
+            >
+              {avatar ? (
+                <Image source={{ uri: avatar }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Ionicons name="person" size={40} color={COLORS.mediumPink} />
+                </View>
+              )}
+              <View style={styles.editIconContainer}>
+                <Ionicons name="camera" size={18} color="#FFF" />
+              </View>
+            </TouchableOpacity>
+            <Text style={styles.avatarHelperText}>Tap to upload profile photo</Text>
+
+            {/* Input Fields with Icons */}
+            <View style={styles.inputContainer}>
+              <Ionicons name="person-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+              <TextInput 
+                placeholder="Full Name" 
+                value={name} 
+                onChangeText={setName} 
+                style={styles.input} 
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Ionicons name="mail-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+              <TextInput 
+                placeholder="Email Address" 
+                keyboardType="email-address" 
+                value={email} 
+                onChangeText={setEmail} 
+                style={styles.input} 
+                autoCapitalize="none"
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Ionicons name="lock-closed-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+              <TextInput 
+                placeholder="Password" 
+                secureTextEntry={!showPassword} 
+                value={password} 
+                onChangeText={setPassword} 
+                style={styles.input} 
+              />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <Ionicons
+                  name={showPassword ? "eye-off-outline" : "eye-outline"}
+                  size={20}
+                  color="#999"
+                />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Ionicons name="call-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+              <TextInput 
+                placeholder="Phone Number" 
+                keyboardType="phone-pad" 
+                value={phoneNumber} 
+                onChangeText={setPhoneNumber} 
+                style={styles.input} 
+              />
+            </View>
+            
+            <View style={styles.inputContainer}>
+              <Ionicons name="home-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
+              <TextInput 
+                placeholder="Address" 
+                value={address} 
+                onChangeText={setAddress} 
+                style={[styles.input, styles.addressInput]} 
+              />
+            </View>
+
+            {/* Error Handling */}
+            {error && <Text style={styles.errorText}>{error}</Text>}
+
+            {/* Register Button */}
+            <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.buttonText}>Create Account</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Divider */}
+            <View style={styles.divider}>
+              <View style={styles.dividerLine} />
+              <Text style={styles.dividerText}>OR</Text>
+              <View style={styles.dividerLine} />
+            </View>
+
+            {/* Already have an account */}
+            <View style={styles.loginLinkContainer}>
+              <Text style={styles.loginText}>Already have an account?</Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                <Text style={styles.loginLink}>Login</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-        )}
-      </TouchableOpacity>
-      <Text style={{ textAlign: "center", marginTop: 5 }}>Tap to upload profile photo</Text>
-
-      {/* Input Fields */}
-      <TextInput placeholder="Full Name" value={name} onChangeText={setName} style={styles.input} />
-      <TextInput placeholder="Email Address" keyboardType="email-address" value={email} onChangeText={setEmail} style={styles.input} />
-      <TextInput placeholder="Password" secureTextEntry value={password} onChangeText={setPassword} style={styles.input} />
-      <TextInput placeholder="Phone Number" keyboardType="phone-pad" value={phoneNumber} onChangeText={setPhoneNumber} style={styles.input} />
-      <TextInput placeholder="Address (Optional)" value={address} onChangeText={setAddress} style={styles.input} />
-
-      {/* Error Handling */}
-      {error && <Text style={{ color: "red", textAlign: "center", marginVertical: 10 }}>{error}</Text>}
-
-      {/* Register Button */}
-      <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={{ color: "#fff", fontSize: 16 }}>Register</Text>}
-      </TouchableOpacity>
-
-      {/* Already have an account */}
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={{ textAlign: "center", marginTop: 20, color: "#007BFF" }}>Already have an account? Login</Text>
-      </TouchableOpacity>
-    </View>
+        </ScrollView>
+      </LinearGradient>
+    </KeyboardAvoidingView>
   );
-};
-
-// Styles
-const styles = {
-  input: {
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    padding: 12,
-    marginBottom: 10,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: "#007BFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
 };
 
 export default RegisterScreen;
