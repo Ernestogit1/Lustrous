@@ -4,3 +4,20 @@
 node_modules/
 node_modules
 /node_modules
+
+const pickImage = async () => {
+  try {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaType.IMAGE, // ✅ Fix: Use ImagePicker.MediaType
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets && result.assets[0]) {
+      setAvatar(result.assets[0].uri);
+    }
+  } catch (error) {
+    Alert.alert("Error", "Failed to select image.");
+  }
+};
