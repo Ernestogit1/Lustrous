@@ -8,4 +8,6 @@ node_modules
 
 # Ignore Firebase service account key
 
+/backend/config/serviceAccountKey.json
+backend/config/serviceAccountKey.json/
 backend/config/serviceAccountKey.json
