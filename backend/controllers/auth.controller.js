@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const admin = require("../config/firebaseAdmin");
 const { cloudinary } = require("../config/cloudinary");
+const generateToken = require("../utils/generateToken");
 
 const registerUser = async (req, res) => {
   try {
@@ -63,6 +64,7 @@ const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+    const token = generateToken(user._id, user.isAdmin);
 
     res.status(200).json({
       message: "Login successful",
@@ -73,6 +75,7 @@ const loginUser = async (req, res) => {
         firebaseUid: user.firebaseUid,
         isAdmin: user.isAdmin,
       },
+      token,
     });
   } catch (error) {
     console.error(error);
@@ -81,5 +84,16 @@ const loginUser = async (req, res) => {
 };
 
 
+const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.userId).select("-password"); // Exclude password
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
 
-module.exports = { registerUser, loginUser };
+module.exports = { registerUser, loginUser, getUserProfile };

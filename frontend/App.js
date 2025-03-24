@@ -1,15 +1,21 @@
 import 'react-native-gesture-handler';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, ActivityIndicator  } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import { Provider } from 'react-redux';
-import { useSelector } from "react-redux";
+import { Provider, useSelector, useDispatch  } from 'react-redux';
+
+
+import { initDB, getToken } from './src/utils/sqliteHelper';
+import axios from 'axios';
+import { API_URL } from '@env';
+import { USER_LOGIN_SUCCESS } from './src/redux/constants/auth.Constants';
+import { logoutUser } from './src/redux/actions/auth.Actions';
 
 
 // store
@@ -66,8 +72,47 @@ function AdminNavigator() {
 }
 
 function MainNavigator() {
+  const dispatch = useDispatch();
+
   const userInfo = useSelector((state) => state.userLogin.userInfo);  // ✅ FIX: Ensure correct state selection
   const isAdmin = userInfo?.isAdmin || false;
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const initAndCheckToken = async () => {
+      await initDB(); 
+      const token = await getToken();
+  
+      if (token) {
+        axios
+          .get(`${API_URL}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          .then((res) => {
+            dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data.user });
+            setIsLoading(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            dispatch(logoutUser());
+            setIsLoading(false);
+          });
+      } else {
+        setIsLoading(false);
+      }
+    };
+  
+    initAndCheckToken();
+  }, [dispatch]);
+  
+
+  if (isLoading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#6200ee" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>
