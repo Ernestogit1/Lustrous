@@ -8,3 +8,4 @@ const generateToken = (userId, isAdmin) => {
 };
 
 module.exports = generateToken;
+
