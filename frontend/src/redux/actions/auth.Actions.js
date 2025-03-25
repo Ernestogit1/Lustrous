@@ -8,11 +8,26 @@ import { USER_REGISTER_REQUEST,
   USER_LOGOUT,
   
  } from "../constants/auth.Constants";
-import { storeToken, removeToken } from "../../utils/sqliteHelper";
+import { storeToken, removeToken, getToken } from "../../utils/sqliteHelper";
 
 import { API_URL } from "@env";
 
 
+
+export const loadUser = () => async (dispatch) => {
+  try {
+    const token = await getToken();
+    if (token) {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.get(`${API_URL}/api/auth/me`, config);
+      dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
+    } else {
+      dispatch({ type: USER_LOGOUT });
+    }
+  } catch (error) {
+    dispatch({ type: USER_LOGOUT });
+  }
+}
 
 export const registerUser = (formData) => async (dispatch) => {
   try {

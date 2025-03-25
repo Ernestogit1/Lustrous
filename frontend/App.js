@@ -11,11 +11,6 @@ import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider, useSelector, useDispatch  } from 'react-redux';
 
 
-import { initDB, getToken } from './src/utils/sqliteHelper';
-import axios from 'axios';
-import { API_URL } from '@env';
-import { USER_LOGIN_SUCCESS } from './src/redux/constants/auth.Constants';
-import { logoutUser } from './src/redux/actions/auth.Actions';
 
 
 // store
@@ -72,39 +67,8 @@ function AdminNavigator() {
 }
 
 function MainNavigator() {
-  const dispatch = useDispatch();
-
-  const userInfo = useSelector((state) => state.userLogin.userInfo);  // ✅ FIX: Ensure correct state selection
+  const { userInfo, isLoading } = useSelector((state) => state.userLogin);
   const isAdmin = userInfo?.isAdmin || false;
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const initAndCheckToken = async () => {
-      await initDB(); 
-      const token = await getToken();
-  
-      if (token) {
-        axios
-          .get(`${API_URL}/api/auth/me`, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          .then((res) => {
-            dispatch({ type: USER_LOGIN_SUCCESS, payload: res.data.user });
-            setIsLoading(false);
-          })
-          .catch((err) => {
-            console.error(err);
-            dispatch(logoutUser());
-            setIsLoading(false);
-          });
-      } else {
-        setIsLoading(false);
-      }
-    };
-  
-    initAndCheckToken();
-  }, [dispatch]);
-  
 
   if (isLoading) {
     return (
