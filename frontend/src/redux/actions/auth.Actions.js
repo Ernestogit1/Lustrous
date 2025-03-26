@@ -8,9 +8,20 @@ import { USER_REGISTER_REQUEST,
   USER_LOGOUT,
   
  } from "../constants/auth.Constants";
-import { storeToken, removeToken, getToken } from "../../utils/sqliteHelper";
+import { storeToken, removeToken, getToken, initDB } from "../../utils/sqliteHelper";
 
 import { API_URL } from "@env";
+
+
+
+
+export const initializeDatabase = () => async (dispatch) => {
+  try {
+    await initDB(); // Initialize the SQLite database
+  } catch (error) {
+    console.error("SQLite Initialization Error:", error);
+  }
+};
 
 
 
