@@ -1,15 +1,16 @@
 import 'react-native-gesture-handler';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, ActivityIndicator  } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 
-import { Provider } from 'react-redux';
-import { useSelector } from "react-redux";
+import { Provider, useSelector, useDispatch  } from 'react-redux';
+
+
 
 
 // store
@@ -66,8 +67,16 @@ function AdminNavigator() {
 }
 
 function MainNavigator() {
-  const userInfo = useSelector((state) => state.userLogin.userInfo);  // ✅ FIX: Ensure correct state selection
+  const { userInfo, isLoading } = useSelector((state) => state.userLogin);
   const isAdmin = userInfo?.isAdmin || false;
+
+  if (isLoading) {
+    return (
+      <View style={styles.loader}>
+        <ActivityIndicator size="large" color="#6200ee" />
+      </View>
+    );
+  }
 
   return (
     <NavigationContainer>

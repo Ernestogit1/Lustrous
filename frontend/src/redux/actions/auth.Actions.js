@@ -6,10 +6,28 @@ import { USER_REGISTER_REQUEST,
   USER_LOGIN_SUCCESS,
   USER_LOGIN_FAIL,
   USER_LOGOUT,
+  
  } from "../constants/auth.Constants";
- 
+import { storeToken, removeToken, getToken } from "../../utils/sqliteHelper";
+
 import { API_URL } from "@env";
 
+
+
+export const loadUser = () => async (dispatch) => {
+  try {
+    const token = await getToken();
+    if (token) {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data } = await axios.get(`${API_URL}/api/auth/me`, config);
+      dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
+    } else {
+      dispatch({ type: USER_LOGOUT });
+    }
+  } catch (error) {
+    dispatch({ type: USER_LOGOUT });
+  }
+}
 
 export const registerUser = (formData) => async (dispatch) => {
   try {
@@ -30,12 +48,8 @@ export const loginUser = (email, password) => async (dispatch) => {
 
     const config = { headers: { "Content-Type": "application/json" } };
     const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password }, config);
-
+    await storeToken(data.token);
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
-
-    // Save user info to AsyncStorage (Optional for persistence)
-    // await AsyncStorage.setItem("userInfo", JSON.stringify(data.user));
-
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -44,3 +58,8 @@ export const loginUser = (email, password) => async (dispatch) => {
   }
 };
 
+
+export const logoutUser = () => async (dispatch) => {
+  await removeToken();
+    dispatch({ type: USER_LOGOUT });
+};

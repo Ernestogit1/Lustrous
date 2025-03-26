@@ -12,7 +12,7 @@ const UserScreen = ({ navigation }) => {
       <Text style={{ fontSize: 24, fontWeight: "bold" }}>Welcome, {userInfo?.name}!</Text>
       <Text>Email: {userInfo?.email}</Text>
       <Button title="Logout" onPress={() => dispatch(logoutUser())} />
-    </View>
+      </View>
   );
 };
 

@@ -4,7 +4,7 @@ import { USER_REGISTER_REQUEST,
   USER_LOGIN_REQUEST,
   USER_LOGIN_SUCCESS,
   USER_LOGIN_FAIL,
-  USER_LOGOUT,
+  USER_LOGOUT, 
  } from "../constants/auth.Constants";
 
  export const authRegisterReducer = (state = {}, action) => {
@@ -21,16 +21,16 @@ import { USER_REGISTER_REQUEST,
 };
 
 
-export const authLoginReducer = (state = { userInfo: null }, action) => {
+export const authLoginReducer = (state = { userInfo: null, isLoading: true }, action) => {
   switch (action.type) {
     case USER_LOGIN_REQUEST:
       return { loading: true };
     case USER_LOGIN_SUCCESS:
-      return { loading: false, userInfo: action.payload };
+      return { loading: false, userInfo: action.payload, isLoading: false };
     case USER_LOGIN_FAIL:
-      return { loading: false, error: action.payload };
+      return { loading: false, error: action.payload, isLoading: false };
     case USER_LOGOUT:
-      return { userInfo: null };
+      return { userInfo: null, isLoading: false };
     default:
       return state;
   }
