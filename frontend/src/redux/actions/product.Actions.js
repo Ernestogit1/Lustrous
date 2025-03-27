@@ -14,3 +14,4 @@ export const createProduct = (formData) => async (dispatch) => {
     dispatch({ type: CREATE_PRODUCT_FAIL, payload: error.response?.data?.message || error.message });
   }
 };
+
