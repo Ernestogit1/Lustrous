@@ -2,19 +2,79 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Text, View, ScrollView, TouchableOpacity, 
   SafeAreaView, ImageBackground, Image, 
-  Animated, FlatList 
+  Animated, FlatList, ActivityIndicator 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
 import styles, { COLORS } from './style/HomeScreen.styles';
+import { API_URL } from '@env'; // Make sure this is properly set up
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  
+  // State for products data
+  const [allProducts, setAllProducts] = useState([]);     // Store all fetched products
+  const [products, setProducts] = useState([]);           // Products to display (filtered or all)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null); // Track selected category
+  
   const [currentIndex, setCurrentIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const flatListRef = useRef(null);
   
+  // Fixed categories
+  const categories = ["All", "Lip Products", "Foundation", "Palette", "Blush", "Tools"];
+  
+  // Fetch latest products when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get(`${API_URL}/api/products?limit=5&sort=-createdAt`);
+        
+        // Handle different API response formats
+        const productData = response.data.products || response.data;
+        setAllProducts(productData);  // Store all products
+        setProducts(productData);     // Initially show all products
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching products:', err);
+        setError('Failed to load products. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  // Handle category selection
+  const handleCategorySelect = (category, index) => {
+    // If already selected, deselect it (show all products)
+    if (selectedCategory === category) {
+      setSelectedCategory(null);
+      setProducts(allProducts);
+      return;
+    }
+    
+    setSelectedCategory(category);
+    
+    if (category === 'All') {
+      setProducts(allProducts);
+      return;
+    }
+
+    const filtered = allProducts.filter(product => {
+      const productCategory = (product.category || '').toLowerCase();
+      return productCategory === category.toLowerCase() || 
+             productCategory.includes(category.toLowerCase());
+    });
+    
+    setProducts(filtered);
+  };
  
   const heroImages = [
     require('../../assets/home1.png'),
@@ -22,7 +82,6 @@ const HomeScreen = () => {
     require('../../assets/home3.png'),
   ];
 
-  // Auto scroll carousel
   useEffect(() => {
     const fadeOut = () => {
       Animated.timing(fadeAnim, {
@@ -55,32 +114,11 @@ const HomeScreen = () => {
     return () => clearInterval(interval);
   }, [currentIndex]);
 
-  // Sample products data with more realistic information
-  const featuredProducts = [
-    {
-      id: 1,
-      name: "Radiant Serum",
-      price: "$49.99",
-      description: "24-hour hydration",
-      badge: "BESTSELLER"
-    },
-    {
-      id: 2,
-      name: "Glow Essence",
-      price: "$38.99",
-      description: "Brightening formula",
-      badge: "NEW"
-    },
-    {
-      id: 3,
-      name: "Petal Lip Tint",
-      price: "$24.99",
-      description: "Long-lasting color",
-      badge: ""
-    }
-  ];
 
-  // Render hero item for carousel
+  const handleAddToCart = () => {
+    navigation.navigate('Login');
+  };
+
   const renderHeroItem = ({ item }) => {
     return (
       <Animated.View 
@@ -143,7 +181,6 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Hero Section with ImageBackground Carousel */}
         <View style={styles.heroSection}>
           <FlatList
             ref={flatListRef}
@@ -156,7 +193,6 @@ const HomeScreen = () => {
             scrollEnabled={false}
           />
           
-          {/* Carousel Indicators */}
           <View style={styles.carouselIndicators}>
             {heroImages.map((_, index) => (
               <View
@@ -170,61 +206,94 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Categories Scrollable Row */}
         <View style={styles.categoriesContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScrollView}>
-            {["Lip Products", "Palette", "Foundation", "Blush", "Tools"].map((category, index) => (
-              <TouchableOpacity key={index} style={index === 0 ? styles.categoryBtnActive : styles.categoryBtn}>
-                <Text style={index === 0 ? styles.categoryTextActive : styles.categoryText}>{category}</Text>
+            {categories.map((category, index) => (
+              <TouchableOpacity 
+                key={index} 
+                style={selectedCategory === category ? styles.categoryBtnActive : styles.categoryBtn}
+                onPress={() => handleCategorySelect(category, index)}
+              >
+                <Text 
+                  style={selectedCategory === category ? styles.categoryTextActive : styles.categoryText}
+                >
+                  {category}
+                </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
         </View>
 
-        {/* Featured Products */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>New Arrival</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>
+              {'New Arrival'}
+            </Text>
           </View>
           
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productScroll}>
-            {featuredProducts.map((product) => (
-              <TouchableOpacity key={product.id} style={styles.productCard}>
-                <View style={styles.productImageContainer}>
-                  <View style={styles.productImagePlaceholder}>
-                    <LinearGradient
-                      colors={[COLORS.lightPink, COLORS.mediumPink]}
-                      style={styles.productGradient}
-                    >
-                      <Text style={styles.placeholderText}>Product</Text>
-                    </LinearGradient>
-                  </View>
-                  {product.badge && (
-                    <View style={styles.productBadge}>
-                      <Text style={styles.productBadgeText}>{product.badge}</Text>
+          {loading ? (
+            <ActivityIndicator size="large" color={COLORS.darkPurple} style={{padding: 20}} />
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productScroll}>
+              {products && products.length > 0 ? (
+                products.map((product) => (
+                  <TouchableOpacity 
+                    key={product._id} 
+                    style={styles.productCard}
+                    onPress={() => navigation.navigate('ProductDetails', { productId: product._id })}
+                  >
+                    <View style={styles.productImageContainer}>
+                      {product.images && product.images.length > 0 ? (
+                        <Image 
+                          source={{ uri: product.images[0].url || product.images[0] }} 
+                          style={styles.productImage}
+                          resizeMode="cover"
+                        />
+                      ) : (
+                        <View style={styles.productImagePlaceholder}>
+                          <LinearGradient
+                            colors={[COLORS.lightPink, COLORS.mediumPink]}
+                            style={styles.productGradient}
+                          >
+                            <Text style={styles.placeholderText}>Product</Text>
+                          </LinearGradient>
+                        </View>
+                      )}
+                      {product.countInStock <= 5 && product.countInStock > 0 && (
+                        <View style={styles.productBadge}>
+                          <Text style={styles.productBadgeText}>LOW STOCK</Text>
+                        </View>
+                      )}
+                      {product.countInStock === 0 && (
+                        <View style={[styles.productBadge, {backgroundColor: '#ff4d4d'}]}>
+                          <Text style={styles.productBadgeText}>SOLD OUT</Text>
+                        </View>
+                      )}
                     </View>
-                  )}
-                  <TouchableOpacity style={styles.favoriteButton}>
-                    <Ionicons name="heart-outline" size={18} color={COLORS.lightPurple} />
+                    <Text style={styles.productName}>{product.name}</Text>
+                    <Text style={styles.productDescription} numberOfLines={2}>{product.description}</Text>
+                    <View style={styles.productFooter}>
+                      <Text style={styles.productPrice}>₱{product.price}</Text>
+                      <TouchableOpacity 
+                        style={styles.addToCartButton}
+                        onPress={handleAddToCart} 
+                      >
+                        <Ionicons name="add" size={18} color="white" />
+                      </TouchableOpacity>
+                    </View>
                   </TouchableOpacity>
-                </View>
-                <Text style={styles.productName}>{product.name}</Text>
-                <Text style={styles.productDescription}>{product.description}</Text>
-                <View style={styles.productFooter}>
-                  <Text style={styles.productPrice}>{product.price}</Text>
-                  <TouchableOpacity style={styles.addToCartButton}>
-                    <Ionicons name="add" size={18} color="white" />
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+                ))
+              ) : (
+                <Text style={styles.noProductsText}>
+                  {selectedCategory ? `No ${selectedCategory} products found` : 'No products available'}
+                </Text>
+              )}
+            </ScrollView>
+          )}
         </View>
 
-        {/* Benefits Section with Enhanced Design */}
         <View style={styles.benefitsSection}>
           <Text style={styles.sectionTitle}>Why Choose Lustrous?</Text>
           <View style={styles.benefitCards}>
@@ -252,10 +321,9 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* New Arrivals Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>New Arrivals</Text>
+            <Text style={styles.sectionTitle}>Collections</Text>
             <TouchableOpacity>
               <Text style={styles.seeAllText}>See All</Text>
             </TouchableOpacity>
@@ -284,7 +352,6 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Call to Action */}
         <View style={styles.ctaSection}>
           <LinearGradient
             colors={[COLORS.lightPurple, COLORS.darkPurple]}
@@ -296,7 +363,8 @@ const HomeScreen = () => {
             <Text style={styles.ctaText}>
               Register for free and be a part of the Lustrous community!
             </Text>
-            <TouchableOpacity style={styles.ctaButton}>
+            <TouchableOpacity style={styles.ctaButton}
+            onPress={() => navigation.navigate('Register')}>
               <Text style={styles.ctaButtonText}>SHOP NOW</Text>
             </TouchableOpacity>
           </LinearGradient>

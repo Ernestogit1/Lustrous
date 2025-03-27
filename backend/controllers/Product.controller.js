@@ -51,4 +51,54 @@ const createProduct = async (req, res) => {
   }
 };
 
-module.exports = { createProduct };
+const getProducts = async (req, res) => {
+  try {
+
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const sort = req.query.sort || '-createdAt'; 
+    const category = req.query.category || '';
+    
+
+    const query = {};
+    if (category) {
+      query.category = category;
+    }
+    
+    const totalProducts = await Product.countDocuments(query);
+    
+    const products = await Product.find(query)
+      .sort(sort)
+      .limit(limit)
+      .skip((page - 1) * limit);
+    
+    return res.status(200).json({
+      products,
+      page,
+      pages: Math.ceil(totalProducts / limit),
+      total: totalProducts
+    });
+  } catch (error) {
+    console.error("❌ Error fetching products:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+const getProductById = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    
+    return res.status(200).json(product);
+  } catch (error) {
+    console.error("❌ Error fetching product:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = { 
+  createProduct, getProducts, getProductById
+};

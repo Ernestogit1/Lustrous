@@ -198,7 +198,7 @@ export default StyleSheet.create({
     paddingRight: 16,
   },
   productCard: {
-    width: width * 0.4,
+    width: width * 0.45,
     marginRight: 16,
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
@@ -211,6 +211,18 @@ export default StyleSheet.create({
   },
   productImageContainer: {
     position: 'relative',
+    width: '100%',
+    height: 180, // Explicitly set height
+    borderRadius: 8,
+    overflow: 'hidden',
+    marginBottom: 10,
+  },
+  
+  // Add this style for the product image
+  productImage: {
+    width: '100%', 
+    height: '100%',
+    borderRadius: 8,
   },
   productImagePlaceholder: {
     width: '100%',
