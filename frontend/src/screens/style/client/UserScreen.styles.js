@@ -11,6 +11,12 @@ export const COLORS = {
 };
 
 export default StyleSheet.create({
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    backgroundColor: COLORS.lightPurple,
+  },
   container: {
     flex: 1,
     backgroundColor: '#fff',

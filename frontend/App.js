@@ -4,10 +4,10 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider, useSelector } from 'react-redux';
+import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Correct import
 
 // Store
 import authStore from './src/redux/store/Auth.Store';
@@ -16,18 +16,15 @@ import authStore from './src/redux/store/Auth.Store';
 import HomeScreen from './src/screens/HomeScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
-// User screens
-import UserScreen from './src/screens/client/UserScreen';
-import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen';
+// User Drawer Navigator
+import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
 
-const Stack = createNativeStackNavigator();
 const AdminStack = createNativeStackNavigator();
-const UserStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
 
 // Auth Navigator
@@ -38,16 +35,6 @@ function AuthNavigator() {
       <AuthStack.Screen name="Register" component={RegisterScreen} />
       <AuthStack.Screen name="Login" component={LoginScreen} />
     </AuthStack.Navigator>
-  );
-}
-
-// User Navigator
-function UserNavigator() {
-  return (
-    <UserStack.Navigator screenOptions={{ headerShown: false }}>
-      <UserStack.Screen name="UserHome" component={UserScreen} />
-      <UserStack.Screen name="ProductDetails" component={ProductDetailsScreen} />
-    </UserStack.Navigator>
   );
 }
 
@@ -76,7 +63,7 @@ function MainNavigator() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserNavigator />}
+      {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserDrawerNavigator />}
     </NavigationContainer>
   );
 }

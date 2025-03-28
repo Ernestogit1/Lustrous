@@ -37,28 +37,6 @@ const UserScreen = ({ navigation }) => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* User Header Section */}
-      <LinearGradient
-        colors={[COLORS.lightPurple, COLORS.mediumPurple]}
-        style={styles.headerGradient}
-      >
-        <View style={styles.userInfoContainer}>
-          <View style={styles.avatarContainer}>
-            <Text style={styles.avatarText}>
-              {userInfo?.name ? userInfo.name[0].toUpperCase() : "U"}
-            </Text>
-          </View>
-          <Text style={styles.userName}>{userInfo?.name || "User"}</Text>
-          <Text style={styles.userEmail}>{userInfo?.email || "user@email.com"}</Text>
-          
-          <TouchableOpacity 
-            style={styles.logoutButton}
-            onPress={handleLogout}
-          >
-            <Text style={styles.logoutText}>Logout</Text>
-          </TouchableOpacity>
-        </View>
-      </LinearGradient>
 
       {/* Categories Section */}
       <View style={styles.categoriesContainer}>
