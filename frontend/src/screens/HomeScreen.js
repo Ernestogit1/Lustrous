@@ -7,75 +7,51 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+import { useDispatch, useSelector } from 'react-redux'; // Import Redux hooks
 import styles, { COLORS } from './style/HomeScreen.styles';
-import { API_URL } from '@env'; // Make sure this is properly set up
+import { fetchHomeProducts } from '../redux/actions/screens.Actions'; // Import Redux action
 
 const HomeScreen = () => {
   const navigation = useNavigation();
-  
-  // State for products data
-  const [allProducts, setAllProducts] = useState([]);     // Store all fetched products
-  const [products, setProducts] = useState([]);           // Products to display (filtered or all)
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null); // Track selected category
-  
+  const dispatch = useDispatch();
+
+  // Redux state
+  const { products: allProducts, loading, error } = useSelector((state) => state.homeProducts);
+
+  // Local state
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const flatListRef = useRef(null);
-  
+
   // Fixed categories
   const categories = ["All", "Lip Products", "Foundation", "Palette", "Blush", "Tools"];
-  
-  // Fetch latest products when component mounts
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const response = await axios.get(`${API_URL}/api/products?limit=5&sort=-createdAt`);
-        
-        // Handle different API response formats
-        const productData = response.data.products || response.data;
-        setAllProducts(productData);  // Store all products
-        setProducts(productData);     // Initially show all products
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-        setError('Failed to load products. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
 
-    fetchProducts();
-  }, []);
+  // Fetch products using Redux when component mounts
+  useEffect(() => {
+    dispatch(fetchHomeProducts());
+  }, [dispatch]);
+
+  // Update displayed products when allProducts or selectedCategory changes
+  useEffect(() => {
+    if (selectedCategory === null || selectedCategory === 'All') {
+      setProducts(allProducts);
+    } else {
+      const filtered = allProducts.filter(product => {
+        const productCategory = (product.category || '').toLowerCase();
+        return productCategory === selectedCategory.toLowerCase() || 
+               productCategory.includes(selectedCategory.toLowerCase());
+      });
+      setProducts(filtered);
+    }
+  }, [allProducts, selectedCategory]);
 
   // Handle category selection
-  const handleCategorySelect = (category, index) => {
-    // If already selected, deselect it (show all products)
-    if (selectedCategory === category) {
-      setSelectedCategory(null);
-      setProducts(allProducts);
-      return;
-    }
-    
-    setSelectedCategory(category);
-    
-    if (category === 'All') {
-      setProducts(allProducts);
-      return;
-    }
-
-    const filtered = allProducts.filter(product => {
-      const productCategory = (product.category || '').toLowerCase();
-      return productCategory === category.toLowerCase() || 
-             productCategory.includes(category.toLowerCase());
-    });
-    
-    setProducts(filtered);
+  const handleCategorySelect = (category) => {
+    setSelectedCategory(selectedCategory === category ? null : category);
   };
- 
+
   const heroImages = [
     require('../../assets/home1.png'),
     require('../../assets/home2.png'),
@@ -91,7 +67,6 @@ const HomeScreen = () => {
       }).start(() => {
         const nextIndex = (currentIndex + 1) % heroImages.length;
 
-        // Ensure flatListRef is not null before calling scrollToIndex
         if (flatListRef.current) {
           flatListRef.current.scrollToIndex({ 
             index: nextIndex, 
@@ -118,7 +93,6 @@ const HomeScreen = () => {
 
     return () => clearInterval(interval);
   }, [currentIndex]);
-
 
   const handleAddToCart = () => {
     navigation.navigate('Login');
@@ -219,7 +193,7 @@ const HomeScreen = () => {
               <TouchableOpacity 
                 key={index} 
                 style={selectedCategory === category ? styles.categoryBtnActive : styles.categoryBtn}
-                onPress={() => handleCategorySelect(category, index)}
+                onPress={() => handleCategorySelect(category)}
               >
                 <Text 
                   style={selectedCategory === category ? styles.categoryTextActive : styles.categoryText}

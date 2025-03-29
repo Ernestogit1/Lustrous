@@ -83,7 +83,55 @@ const loginUser = async (req, res) => {
 };
 
 
+const googleLoginUser = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "ID token is required" });
+    }
 
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const firebaseUid = decodedToken.uid;
+
+    let user = await User.findOne({ firebaseUid });
+
+    if (!user) {
+      const firebaseUser = await admin.auth().getUser(firebaseUid);
+
+      user = new User({
+        name: firebaseUser.displayName || "Google User",
+        email: firebaseUser.email,
+        firebaseUid,
+        password: "firebase-manage",
+        phoneNumber: 'Not Provided',
+        address: 'Not Provided',
+        avatar: firebaseUser.photoURL || '',
+        isAdmin: false,
+      });
+
+      await user.save();
+    }
+
+    const token = generateToken(user._id, user.isAdmin);
+
+    res.status(200).json({
+      message: "Google login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        firebaseUid: user.firebaseUid,
+        isAdmin: user.isAdmin,
+        avatar: user.avatar,
+      },
+      token,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(401).json({ message: "Google login failed", error: error.message });
+  }
+};
 
 const getUserProfile = async (req, res) => {
   try {
@@ -97,4 +145,4 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile };
+module.exports = { registerUser, loginUser, getUserProfile, googleLoginUser };

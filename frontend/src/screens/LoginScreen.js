@@ -12,11 +12,12 @@ import {
   ScrollView,
 } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/actions/auth.Actions";
+import { loginUser, googleLogin } from "../redux/actions/auth.Actions";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import styles, { COLORS } from "./style/LoginScreen.styles";
+
 
 const LoginScreen = () => {
   const dispatch = useDispatch();
@@ -101,6 +102,10 @@ const LoginScreen = () => {
 
           {/* Error Handling */}
           {error && <Text style={styles.errorText}>{error}</Text>}
+
+          <TouchableOpacity onPress={() => dispatch(googleLogin())} style={styles.googleButton}>
+            <Text style={styles.buttonText}>Sign In with Google</Text>
+          </TouchableOpacity>
 
           {/* Login Button */}
           <TouchableOpacity onPress={handleLogin} style={styles.button} disabled={loading}>

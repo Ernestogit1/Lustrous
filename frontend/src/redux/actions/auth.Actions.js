@@ -8,9 +8,10 @@ import { USER_REGISTER_REQUEST,
   USER_LOGOUT,
   
  } from "../constants/auth.Constants";
- import { signInWithEmailAndPassword } from "firebase/auth";
+ import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential   } from "firebase/auth";
  import { auth } from "../../config/firebase"; 
 import { storeToken, removeToken, getToken, initDB } from "../../utils/sqliteHelper";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { API_URL } from "@env";
 
@@ -74,6 +75,32 @@ export const loginUser = (email, password) => async (dispatch) => {
   }
 };
 
+
+export const googleLogin = () => async (dispatch) => {
+  try {
+    dispatch({ type: USER_LOGIN_REQUEST });
+    await GoogleSignin.signOut();
+    await GoogleSignin.hasPlayServices();
+
+    const userInfo = await GoogleSignin.signIn();
+    const { idToken, accessToken } = await GoogleSignin.getTokens();
+
+    const googleCredential = GoogleAuthProvider.credential(idToken, accessToken);
+
+    const firebaseUserCredential = await signInWithCredential(auth, googleCredential);
+    const firebaseIdToken = await firebaseUserCredential.user.getIdToken();
+
+    const config = { headers: { "Content-Type": "application/json" } };
+    const { data } = await axios.post(`${API_URL}/api/auth/google-login`, { idToken: firebaseIdToken }, config);
+
+    await storeToken(data.token);
+    dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
+
+  } catch (error) {
+    console.log("Google Login Error", error);
+    dispatch({ type: USER_LOGIN_FAIL, payload: error.message });
+  }
+};
 
 
 export const logoutUser = () => async (dispatch) => {

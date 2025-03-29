@@ -19,14 +19,22 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "googleServicesFile": "./google-services.json",
+      "package": "com.yurinutella.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-font",
-      "expo-sqlite"
-    ]
+      "expo-sqlite",
+      "@react-native-google-signin/google-signin"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "95d01ac1-1f28-4e9f-b4ac-c1371ca8ce31"
+      }
+    }
   }
 }

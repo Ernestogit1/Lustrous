@@ -3,18 +3,16 @@ const { cloudinary } = require('../config/cloudinary');
 
 const createProduct = async (req, res) => {
   try {
-    const { name, category, stock } = req.body;
+    const { name, category, price, description, stock } = req.body;
 
-    // ✅ Validate required fields
-    if (!name || !category || stock === undefined) {
+    if (!name || !category || !price || !description || stock === undefined) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (stock < 0) {
-      return res.status(400).json({ message: "Stock cannot be negative" });
+    if (stock < 0 || price < 0) {
+      return res.status(400).json({ message: "Stock and Price cannot be negative" });
     }
 
-    // ✅ Check if Multer is correctly passing files
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({ message: "At least one image is required" });
     }
@@ -23,31 +21,82 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: "You can only upload up to 5 images" });
     }
 
-    let imageUrls = [];
-    for (const file of req.files) {
-      const result = await cloudinary.uploader.upload(file.path, {
-        folder: 'products',
-      });
-
-      imageUrls.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
-    }
+    // ✅ req.files already contains secure_url and public_id
+    const imageUrls = req.files.map(file => ({
+      public_id: file.filename, // filename is public_id
+      url: file.path            // path is the Cloudinary secure_url
+    }));
 
     const newProduct = new Product({
       name,
       category,
+      price,
+      description,
       stock,
       images: imageUrls,
     });
 
     await newProduct.save();
-    
     return res.status(201).json({ message: "Product created successfully", product: newProduct });
   } catch (error) {
-    console.error("❌ Error creating product:", error); // ✅ Log for debugging
+    console.error("❌ Error creating product:", error);
     return res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+
+const updateProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Product not found' });
+
+    const { name, category, price, description, stock } = req.body;
+
+    product.name = name || product.name;
+    product.category = category || product.category;
+    product.price = price || product.price;
+    product.description = description || product.description;
+    product.stock = stock ?? product.stock;
+
+    // If images are uploaded, delete old ones from cloudinary
+    if (req.files && req.files.length > 0) {
+      for (const img of product.images) {
+        await cloudinary.uploader.destroy(img.public_id);
+      }
+
+      const uploadedImages = req.files.map(file => ({
+        public_id: file.filename,
+        url: file.path,
+      }));
+      product.images = uploadedImages;
+    }
+
+    const updated = await product.save();
+    return res.status(200).json({ message: "Product updated", product: updated });
+  } catch (error) {
+    console.error('❌ Update error:', error);
+    return res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+const productsDataTable = async (req, res) => {
+  try {
+    console.log("📥 productsDataTable route hit");
+
+    const products = await Product.find().sort('-createdAt');
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    console.error("❌ Error fetching all products (raw):", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message,
+    });
   }
 };
 
@@ -100,5 +149,5 @@ const getProductById = async (req, res) => {
 };
 
 module.exports = { 
-  createProduct, getProducts, getProductById
+  createProduct, getProducts, getProductById, productsDataTable, updateProduct
 };

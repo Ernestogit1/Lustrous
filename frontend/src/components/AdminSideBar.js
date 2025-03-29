@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/actions/auth.Actions";
 import Product from '../screens/server/Product/Product';
 import ProductCreate from '../screens/server/Product/Product.Create';
+import UpdateProduct from '../screens/server/Product/Product.Update';
 
 const Drawer = createDrawerNavigator();
 
@@ -24,6 +25,13 @@ export default function AdminSideBar() {
       <Drawer.Screen name="Products" component={Product} />
       <Drawer.Screen name="CreateProduct" component={ProductCreate} />
 <Drawer.Screen name="Logout" component={LogoutScreen} />
+
+<Drawer.Screen
+  name="UpdateProduct"
+  component={UpdateProduct}
+  options={{ drawerItemStyle: { display: 'none' } }} // Hides from sidebar
+/>
     </Drawer.Navigator>
+    
   );
 }

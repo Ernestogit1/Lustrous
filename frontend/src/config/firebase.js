@@ -2,6 +2,9 @@ import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { Platform } from 'react-native';
+
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -16,10 +19,18 @@ const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 // const analytics = getAnalytics(app);
+
+export const configureGoogleSignIn = () => {
+  GoogleSignin.configure({
+    webClientId: "811935399178-4nd4ge7gufdiadboaksbkr91gcsh48m6.apps.googleusercontent.com", // ✅ This is correct
+    offlineAccess: true,
+  });
+};
+
+
 
 export { app, auth};

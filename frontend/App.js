@@ -1,3 +1,4 @@
+import 'expo-dev-client';
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
@@ -8,9 +9,11 @@ import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider, useSelector } from 'react-redux';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Correct import
+import { configureGoogleSignIn } from './src/config/firebase';
+
 
 // Store
-import authStore from './src/redux/store/Auth.Store';
+import Store from './src/redux/store/Store';
 
 // Auth screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -22,6 +25,9 @@ import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
 import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; // Add ProductDetailsScreen
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
+
+
+
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -89,6 +95,7 @@ function MainNavigator() {
     </NavigationContainer>
   );
 }
+configureGoogleSignIn();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -109,7 +116,9 @@ export default function App() {
   }
 
   return (
-    <Provider store={authStore}>
+
+    
+    <Provider store={Store}>
       <PaperProvider>
         <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
           <MainNavigator />
