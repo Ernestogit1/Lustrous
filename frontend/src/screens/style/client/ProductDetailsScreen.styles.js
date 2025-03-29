@@ -75,12 +75,12 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   productPrice: {
-    fontSize: 18,
+    fontSize: 20,
     fontFamily: "Poppins-Medium",
     color: COLORS.mediumPurple,
   },
   productStock: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: "Poppins-Regular",
     color: COLORS.gray,
   },

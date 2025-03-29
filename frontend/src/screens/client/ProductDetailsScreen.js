@@ -61,8 +61,8 @@ const ProductDetailsScreen = ({ route }) => {
         <View style={styles.priceStockContainer}>
           <Text style={styles.productPrice}>₱{product.price}</Text>
           <Text style={styles.productStock}>
-            {product.countInStock > 0
-              ? `${product.countInStock} in stock`
+            {product.stock > 0
+              ? `Stock: ${product.stock}`
               : "Out of stock"}
           </Text>
         </View>
@@ -72,10 +72,10 @@ const ProductDetailsScreen = ({ route }) => {
         <TouchableOpacity
           style={[
             styles.addToCartButton,
-            product.countInStock === 0 && styles.disabledButton,
+            product.stock === 0 && styles.disabledButton,
           ]}
           onPress={handleAddToCart}
-          disabled={product.countInStock === 0}
+          disabled={product.stock === 0}
         >
           <Ionicons name="cart-outline" size={18} color="white" />
           <Text style={styles.addToCartText}>Add to Cart</Text>

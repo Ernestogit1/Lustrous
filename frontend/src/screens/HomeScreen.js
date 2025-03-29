@@ -250,7 +250,6 @@ const HomeScreen = () => {
                   <TouchableOpacity 
                     key={product._id} 
                     style={styles.productCard}
-                    onPress={() => navigation.navigate('ProductDetails', { productId: product._id })}
                   >
                     <View style={styles.productImageContainer}>
                       {product.images && product.images.length > 0 ? (
