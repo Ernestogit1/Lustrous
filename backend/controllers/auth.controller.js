@@ -48,22 +48,20 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { email, password } = req.body;
-    if (!email || !password) {
-      return res.status(400).json({ message: "Please provide email and password" });
+    const { idToken } = req.body;
+    if (!idToken) {
+      return res.status(400).json({ message: "ID token is required" });
     }
 
-    // Authenticate user with Firebase
-    const userRecord = await admin.auth().getUserByEmail(email);
-    if (!userRecord) {
-      return res.status(401).json({ message: "Invalid credentials" });
-    }
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const firebaseUid = decodedToken.uid;
 
-    // Retrieve user from MongoDB
-    const user = await User.findOne({ firebaseUid: userRecord.uid });
+ 
+    const user = await User.findOne({ firebaseUid });
     if (!user) {
       return res.status(401).json({ message: "User not found" });
     }
+
     const token = generateToken(user._id, user.isAdmin);
 
     res.status(200).json({
@@ -77,11 +75,14 @@ const loginUser = async (req, res) => {
       },
       token,
     });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Login failed", error: error.message });
+    res.status(401).json({ message: "Invalid or expired Firebase token", error: error.message });
   }
 };
+
+
 
 
 const getUserProfile = async (req, res) => {
