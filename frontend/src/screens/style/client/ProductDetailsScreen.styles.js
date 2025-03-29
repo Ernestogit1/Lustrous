@@ -1,61 +1,105 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-const { width } = Dimensions.get("window");
+export const COLORS = {
+  darkPurple: "#6B3FA0",
+  mediumPurple: "#9B7FD1",
+  lightPurple: "#C9B8E8",
+  lightPink: "#F9F1FD",
+  mediumPink: "#F2D7ED",
+  gray: "#555",
+  white: "#fff",
+};
 
-export default StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
-    padding: 16,
-  },
-  loadingText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "#666",
-  },
-  errorText: {
-    textAlign: "center",
-    fontSize: 16,
-    color: "red",
+    backgroundColor: COLORS.lightPink,
   },
   carouselContainer: {
-    width: width,
-    height: 250,
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  carouselImage: {
-    width: width,
-    height: 250,
-    borderRadius: 10,
+  mainImage: {
+    width: Dimensions.get("window").width,
+    height: 300,
+    resizeMode: "cover",
+  },
+  thumbnailContainer: {
+    flexDirection: "row",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  thumbnailImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    marginHorizontal: 5,
+    borderWidth: 2,
+    borderColor: "transparent",
+  },
+  activeThumbnail: {
+    borderColor: COLORS.darkPurple,
+  },
+  detailsContainer: {
+    padding: 16,
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 5,
   },
   productName: {
     fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "Poppins-Bold",
+    color: COLORS.darkPurple,
     marginBottom: 8,
-  },
-  productDescription: {
-    fontSize: 16,
-    color: "#666",
-    marginBottom: 16,
   },
   productPrice: {
     fontSize: 20,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 8,
-  },
-  productStock: {
-    fontSize: 16,
-    color: "#666",
+    fontFamily: "Poppins-Medium",
+    color: COLORS.mediumPurple,
     marginBottom: 16,
   },
-  ratingContainer: {
+  productDescription: {
+    fontSize: 16,
+    fontFamily: "Poppins-Regular",
+    color: COLORS.gray,
+    lineHeight: 24,
+  },
+  priceStockContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  productPrice: {
+    fontSize: 18,
+    fontFamily: "Poppins-Medium",
+    color: COLORS.mediumPurple,
+  },
+  productStock: {
+    fontSize: 14,
+    fontFamily: "Poppins-Regular",
+    color: COLORS.gray,
+  },
+  addToCartButton: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
+    backgroundColor: COLORS.darkPurple,
+    paddingVertical: 12,
+    borderRadius: 8,
+    width: "70%",
+    alignSelf: "center",
   },
-  ratingText: {
+  addToCartText: {
     fontSize: 16,
-    color: "#333",
+    fontFamily: "Poppins-Medium",
+    color: COLORS.white,
+    marginLeft: 8,
   },
 });
+
+export default styles;

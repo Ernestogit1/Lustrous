@@ -212,5 +212,14 @@ export default StyleSheet.create({
     fontFamily: 'Poppins-Medium',
     color: 'white',
   },
+  carouselContainer: {
+    height: 170,
+    marginBottom: 20, 
+  },
+  carouselImage: {
+    width: Dimensions.get("window").width, 
+    height: "100%", 
+    resizeMode: "cover", 
+  },
 });
 

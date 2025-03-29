@@ -90,10 +90,15 @@ const HomeScreen = () => {
         useNativeDriver: true,
       }).start(() => {
         const nextIndex = (currentIndex + 1) % heroImages.length;
-        flatListRef.current.scrollToIndex({ 
-          index: nextIndex, 
-          animated: false 
-        });
+
+        // Ensure flatListRef is not null before calling scrollToIndex
+        if (flatListRef.current) {
+          flatListRef.current.scrollToIndex({ 
+            index: nextIndex, 
+            animated: false 
+          });
+        }
+
         setCurrentIndex(nextIndex);
         fadeIn();
       });
@@ -142,7 +147,8 @@ const HomeScreen = () => {
                 <Text style={styles.heroSubtitle}>
                   Premium makeup products that enhance your natural glow
                 </Text>
-                <TouchableOpacity style={styles.heroButton}>
+                <TouchableOpacity style={styles.heroButton}
+                onPress={() => navigation.navigate('Login')}>
                   <Text style={styles.buttonText}>SHOP NOW</Text>
                 </TouchableOpacity>
               </View>
@@ -206,6 +212,7 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Categories */}
         <View style={styles.categoriesContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesScrollView}>
             {categories.map((category, index) => (
@@ -224,6 +231,7 @@ const HomeScreen = () => {
           </ScrollView>
         </View>
 
+        {/* Products Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>
@@ -294,6 +302,7 @@ const HomeScreen = () => {
           )}
         </View>
 
+        {/* Benefits Section */}
         <View style={styles.benefitsSection}>
           <Text style={styles.sectionTitle}>Why Choose Lustrous?</Text>
           <View style={styles.benefitCards}>
@@ -321,6 +330,7 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Collections Section */}
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Collections</Text>
@@ -352,6 +362,7 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Call-to-Action Section */}
         <View style={styles.ctaSection}>
           <LinearGradient
             colors={[COLORS.lightPurple, COLORS.darkPurple]}

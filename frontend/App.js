@@ -18,6 +18,8 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 // User Drawer Navigator
 import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
+// User Stack Navigator Screens
+import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; // Add ProductDetailsScreen
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
@@ -26,6 +28,7 @@ SplashScreen.preventAutoHideAsync();
 
 const AdminStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
+const UserStack = createNativeStackNavigator(); // Add UserStack for ProductDetails
 
 // Auth Navigator
 function AuthNavigator() {
@@ -47,6 +50,25 @@ function AdminNavigator() {
   );
 }
 
+// User Navigator 
+function UserNavigator() {
+  return (
+    <UserStack.Navigator screenOptions={{ headerShown: false }}>
+      {/* Drawer Navigator */}
+      <UserStack.Screen name="UserDrawer" component={UserDrawerNavigator} />
+      {/* Non-Drawer Screens */}
+      <UserStack.Screen
+        name="ProductDetails"
+        component={ProductDetailsScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+    </UserStack.Navigator>
+  );
+}
+
 // Main Navigator
 function MainNavigator() {
   const { userInfo, isLoading } = useSelector((state) => state.userLogin);
@@ -63,7 +85,7 @@ function MainNavigator() {
   return (
     <NavigationContainer>
       <StatusBar style="auto" />
-      {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserDrawerNavigator />}
+      {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserNavigator />}
     </NavigationContainer>
   );
 }
