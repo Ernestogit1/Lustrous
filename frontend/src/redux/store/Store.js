@@ -5,6 +5,7 @@ import { homeProductsReducer } from '../reducers/screens.Reducers';
 import { loadUser, initializeDatabase } from "../actions/auth.Actions";
 import { productDetailsReducer } from '../reducers/user.Reducers';
 import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
+import { cartReducer, cartListReducer } from '../reducers/order.Reducers';
 
 
 const rootReducer = combineReducers({
@@ -15,6 +16,8 @@ const rootReducer = combineReducers({
 
 
   // transaction
+  cart: cartReducer,
+  cartList: cartListReducer,
 
 // admin side
 productCreate: productCreateReducer,

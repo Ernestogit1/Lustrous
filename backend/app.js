@@ -3,6 +3,7 @@ const cors = require('cors');
 
 const productRoutes = require('./routes/product.routes.js'); 
 const authRoutes = require('./routes/auth.routes.js');
+const orderRoutes = require('./routes/order.routes');
 
 const app = express();
 
@@ -17,6 +18,7 @@ app.use(cors());
 
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
 
 
 module.exports = app;

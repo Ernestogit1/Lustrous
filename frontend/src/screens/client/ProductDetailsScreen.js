@@ -2,10 +2,14 @@ import React, { useState } from "react";
 import { View, Text, Image, ScrollView, FlatList, TouchableOpacity } from "react-native";
 import styles, { COLORS } from "../style/client/ProductDetailsScreen.styles";
 import { Ionicons } from "@expo/vector-icons";
+import { useDispatch, useSelector } from 'react-redux';
+import { addToCart } from '../../redux/actions/order.Actions'; 
 
 const ProductDetailsScreen = ({ route }) => {
   const { product } = route.params;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const dispatch = useDispatch();
+const userInfo = useSelector((state) => state.userLogin?.userInfo);
 
   const handleImagePress = (index) => {
     setCurrentImageIndex(index);
@@ -18,8 +22,9 @@ const ProductDetailsScreen = ({ route }) => {
   };
 
   const handleAddToCart = () => {
-
-    console.log(`Added ${product.name} to cart`);
+    if (userInfo?._id) {
+      dispatch(addToCart(product._id));
+    }
   };
 
   return (

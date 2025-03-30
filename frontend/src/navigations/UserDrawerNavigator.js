@@ -4,6 +4,9 @@ import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the menu i
 import UserScreen from "../screens/client/UserScreen"; // Home screen
 import ProfileScreen from "../screens/client/ProfileScreen"; // Profile screen
 import UserDrawer from "../components/UserDrawer";
+
+import CartScreen from "../screens/client/CartScreen";
+
 import { COLORS } from "../screens/style/client/UserDrawer.styles";
 
 const Drawer = createDrawerNavigator();
@@ -72,6 +75,23 @@ const UserDrawerNavigator = () => {
               color={COLORS.darkPurple}
               style={{ marginLeft: 16 }}
               onPress={() => navigation.toggleDrawer()} // Toggle the drawer
+            />
+          ),
+        })}
+      />
+
+      <Drawer.Screen
+        name="Cart"
+        component={CartScreen}
+        options={({ navigation }) => ({
+          drawerLabel: "My Cart",
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={24}
+              color={COLORS.darkPurple}
+              style={{ marginLeft: 16 }}
+              onPress={() => navigation.toggleDrawer()}
             />
           ),
         })}

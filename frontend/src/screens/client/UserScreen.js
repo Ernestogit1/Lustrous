@@ -8,6 +8,10 @@ import { logoutUser } from "../../redux/actions/auth.Actions";
 import { getAllProducts } from "../../redux/actions/user.Actions"; 
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { addToCart } from "../../redux/actions/order.Actions"; 
+import { useIsFocused } from '@react-navigation/native';
+
+
 import styles, { COLORS } from "../style/client/UserScreen.styles";
 
 const UserScreen = ({ navigation }) => {
@@ -16,14 +20,17 @@ const UserScreen = ({ navigation }) => {
   const [selectedCategory, setSelectedCategory] = useState("All"); 
   const [currentIndex, setCurrentIndex] = useState(0); // Track the current carousel index
   const carouselRef = useRef(null); // Reference for the FlatList
+  const isFocused = useIsFocused();
 
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
   const { loading, error, products } = useSelector((state) => state.productDetails);
 
   // Fetch products on component mount
   useEffect(() => {
-    dispatch(getAllProducts());
-  }, [dispatch]);
+    if (isFocused) {
+      dispatch(getAllProducts());
+    }
+  }, [isFocused, dispatch]);
 
   // Handle logout
   const handleLogout = () => {
@@ -146,13 +153,15 @@ const UserScreen = ({ navigation }) => {
                 
                 {/* Add to Cart Button */}
                 <TouchableOpacity
-                  style={styles.addToCartButton}
-                  onPress={() => {
-                    console.log("Add to cart (not implemented):", product._id);
-                  }}
-                >
-                  <Ionicons name="cart-outline" size={16} color="white" />
-                  <Text style={styles.addToCartText}>Add to Cart</Text>
+                   style={styles.addToCartButton}
+                   onPress={() => {
+                     if (userInfo?._id) {
+                      dispatch(addToCart(product._id));
+                    }
+                   }}
+                 >
+                   <Ionicons name="cart-outline" size={16} color="white" />
+                   <Text style={styles.addToCartText}>Add to Cart</Text>
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
