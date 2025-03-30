@@ -14,6 +14,8 @@ const rootReducer = combineReducers({
   productDetails: productDetailsReducer,
 
 
+  // transaction
+
 // admin side
 productCreate: productCreateReducer,
 productList: productListReducer,

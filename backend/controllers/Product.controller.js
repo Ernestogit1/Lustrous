@@ -81,9 +81,8 @@ const updateProduct = async (req, res) => {
 
 const productsDataTable = async (req, res) => {
   try {
-    console.log("📥 productsDataTable route hit");
 
-    const products = await Product.find().sort('-createdAt');
+    const products = await Product.find({ deleted: false }).sort('-createdAt');
 
     res.status(200).json({
       success: true,
@@ -99,6 +98,62 @@ const productsDataTable = async (req, res) => {
     });
   }
 };
+
+
+const softDeleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.deleted = true;
+    await product.save();
+
+    res.status(200).json({ message: "Product moved to trash." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+const restoreProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    product.deleted = false;
+    await product.save();
+
+    res.status(200).json({ message: "Product restored." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+const permanentDeleteProduct = async (req, res) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    for (const img of product.images) {
+      await cloudinary.uploader.destroy(img.public_id);
+    }
+
+    await product.deleteOne();
+    res.status(200).json({ message: "Product permanently deleted." });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
+
+const listTrashedProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ deleted: true }).sort('-createdAt');
+    res.status(200).json({ success: true, products });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 
 const getProducts = async (req, res) => {
   try {
@@ -149,5 +204,5 @@ const getProductById = async (req, res) => {
 };
 
 module.exports = { 
-  createProduct, getProducts, getProductById, productsDataTable, updateProduct
+  createProduct, getProducts, getProductById, productsDataTable, updateProduct, permanentDeleteProduct, softDeleteProduct, restoreProduct, listTrashedProducts
 };

@@ -1,28 +1,31 @@
 import React, { useEffect } from 'react';
-import { View, FlatList, StyleSheet, Text, Image, ScrollView  } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Image, ScrollView } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { listProducts, softDeleteProduct } from '../../../redux/actions/product.Actions';
-import { ActivityIndicator, MD3Colors  } from 'react-native-paper';
-import { useIsFocused } from '@react-navigation/native';
-
+import { ActivityIndicator, MD3Colors } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useIsFocused } from '@react-navigation/native';
 
-export default function Product({ navigation }) {
+import {
+  listTrashedProducts,
+  restoreProduct,
+  permanentDeleteProduct
+} from '../../../redux/actions/product.Actions';
+
+export default function ProductTrash() {
   const dispatch = useDispatch();
-  const isFocused = useIsFocused();
+    const isFocused = useIsFocused();
   const { loading, error, products } = useSelector((state) => state.productList);
+
+//   useEffect(() => {
+//     dispatch(listTrashedProducts());
+//   }, [dispatch]);
 
 useEffect(() => {
   if (isFocused) {
-    dispatch(listProducts());
+    dispatch(listTrashedProducts());
   }
 }, [dispatch, isFocused]);
-
-  // useEffect(() => {
-  //   dispatch(listProducts());
-  // }, [dispatch]);
-
   const renderItem = ({ item }) => (
     <View style={styles.row}>
       <View style={styles.cell}>
@@ -34,35 +37,31 @@ useEffect(() => {
       <Text style={styles.cell}>{item.stock}</Text>
       <Text style={styles.cell} numberOfLines={1}>{item.description}</Text>
       <View style={styles.cell}>
-        <TouchableOpacity onPress={() => navigation.navigate('UpdateProduct', { productId: item._id })}>
-          <Ionicons name="create-outline" size={20} color="blue" />
+        <TouchableOpacity onPress={() => dispatch(restoreProduct(item._id))}>
+          <Ionicons name="refresh" size={20} color="green" />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => dispatch(softDeleteProduct(item._id))}>
-        <Ionicons name="trash" size={20} color="red" />
-      </TouchableOpacity>
+        <TouchableOpacity onPress={() => dispatch(permanentDeleteProduct(item._id))}>
+          <Ionicons name="trash-bin" size={20} color="red" style={{ marginLeft: 10 }} />
+        </TouchableOpacity>
       </View>
-    
-
     </View>
   );
-  
 
   return (
     <ScrollView style={styles.container} horizontal>
       <View style={{ minWidth: 800 }}>
         <View style={[styles.row, styles.headerRow]}>
-        <Text style={[styles.cell, styles.headerText]}>Image</Text>
+          <Text style={[styles.cell, styles.headerText]}>Image</Text>
           <Text style={[styles.cell, styles.headerText]}>Name</Text>
           <Text style={[styles.cell, styles.headerText]}>Category</Text>
           <Text style={[styles.cell, styles.headerText]}>Price</Text>
           <Text style={[styles.cell, styles.headerText]}>Stock</Text>
           <Text style={[styles.cell, styles.headerText]}>Description</Text>
           <Text style={[styles.cell, styles.headerText]}>Action</Text>
-
         </View>
 
         {loading ? (
-<ActivityIndicator animating={true} color={MD3Colors.primary70} />
+          <ActivityIndicator animating={true} color={MD3Colors.primary70} />
         ) : error ? (
           <Text style={{ color: 'red' }}>{error}</Text>
         ) : (

@@ -45,3 +45,31 @@ export const updateProduct = (id, formData) => async (dispatch) => {
     console.error("Update failed", error);
   }
 };
+
+
+
+export const softDeleteProduct = (id) => async (dispatch) => {
+  await axios.put(`${API_URL}/api/products/delete/${id}`);
+  dispatch(listProducts());
+};
+
+export const restoreProduct = (id) => async (dispatch) => {
+  await axios.put(`${API_URL}/api/products/restore/${id}`);
+  dispatch(listProducts());
+};
+
+export const permanentDeleteProduct = (id) => async (dispatch) => {
+  await axios.delete(`${API_URL}/api/products/permanent-delete/${id}`);
+  dispatch(listProducts());
+};
+
+export const listTrashedProducts = () => async (dispatch) => {
+  try {
+    dispatch({ type: LIST_PRODUCTS_REQUEST });
+    const { data } = await axios.get(`${API_URL}/api/products/trash`);
+    dispatch({ type: LIST_PRODUCTS_SUCCESS, payload: data.products }); 
+  } catch (error) {
+    dispatch({ type: LIST_PRODUCTS_FAIL, payload: error.message });
+  }
+};
+
