@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import { getCartItems, removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions';
+import {  removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions'; // getCartItems {unused imports} 
 import { COLORS } from '../style/client/UserDrawer.styles';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -17,8 +17,8 @@ export default function CartScreen() {
 
   useEffect(() => {
     if (isFocused && userInfo?._id) {
-      dispatch(getCartItemsFromSQLite()); 
-      dispatch(getCartItems());           
+      dispatch(getCartItemsFromSQLite());   // get from sqlite
+    //   dispatch(getCartItems());     // get from mongo db       
     }
   }, [isFocused, dispatch, userInfo]);
   

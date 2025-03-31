@@ -7,7 +7,9 @@ const addToCart = async (req, res) => {
       const { productId } = req.body;
   
       const product = await Product.findById(productId);
-      if (!product) return res.status(404).json({ message: 'Product not found' });
+      if (!product) {
+        return res.status(404).json({ message: 'Product not found' });
+      }
   
       let cartItem = await Cart.findOne({ user: userId, product: productId });
   
@@ -28,7 +30,11 @@ const addToCart = async (req, res) => {
       }
   
       await cartItem.save();
-      res.status(200).json({ success: true, cartItem });
+  
+      // ✅ Populate full product details before sending to frontend
+      await cartItem.populate('product', 'name price images stock');
+  
+      res.status(200).json({ success: true, cartItem }); // ✅ frontend will save to SQLite
     } catch (err) {
       res.status(500).json({
         success: false,

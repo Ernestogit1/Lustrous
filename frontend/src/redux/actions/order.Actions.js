@@ -32,7 +32,8 @@ export const addToCart = (productId) => async (dispatch) => {
 
     dispatch({ type: ADD_TO_CART_SUCCESS, payload: data.cartItem });
     await upsertCartItemSQLite(data.cartItem); 
-    dispatch(getCartItems());
+    dispatch(getCartItemsFromSQLite()); // ✅ Refresh cart from SQLite
+    // dispatch(getCartItems());
   } catch (error) {
     const message = error.response?.data?.message || error.message;
     if (message.includes('Maximum quantity')) {
@@ -46,7 +47,7 @@ export const addToCart = (productId) => async (dispatch) => {
   }
 };
 
-
+//  get cart items from mongodb
 export const getCartItems = () => async (dispatch, getState) => {
   try {
     dispatch({ type: CART_LIST_REQUEST });
@@ -82,45 +83,66 @@ export const removeFromCart = (cartItemId) => async (dispatch) => {
 
     await axios.delete(`${API_URL}/api/orders/cart/${cartItemId}`, config);
     await deleteCartItemSQLite(cartItemId);
-    dispatch(getCartItems()); // refresh cart
+    dispatch(getCartItemsFromSQLite()); // ✅ Refresh from SQLite only
+    // dispatch(getCartItems()); // refresh cart
   } catch (error) {
     console.error('Remove from cart error:', error.message);
   }
 };
 
-export const updateCartQuantity = (cartItemId, type) => async (dispatch, getState) => {
+export const updateCartQuantity = (cartItemId, type) => async (dispatch) => {
   try {
     const token = await getToken();
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    await axios.put(`${API_URL}/api/orders/cart/${cartItemId}`, { type }, config);
+    // ✅ Update quantity in MongoDB
+    const { data } = await axios.put(`${API_URL}/api/orders/cart/${cartItemId}`, { type }, config);
 
-    // Get fresh cart items
-    const { data } = await axios.get(`${API_URL}/api/orders/cart`, config);
-    dispatch({ type: CART_LIST_SUCCESS, payload: data.items });
+    // ✅ Save updated item to SQLite
+    const updatedItem = data.cartItem;
+    if (updatedItem) {
+      await upsertCartItemSQLite(updatedItem);
+    }
 
-    // Find updated item and save it to SQLite
-    const updatedItem = data.items.find((item) => item._id === cartItemId);
-    if (updatedItem) await upsertCartItemSQLite(updatedItem);
+    // ✅ Refresh cart from local SQLite DB
+    dispatch(getCartItemsFromSQLite());
   } catch (error) {
     console.error('Update quantity failed:', error.response?.data?.message || error.message);
   }
 };
 
+
+
+//get cart items from sqlite
 export const getCartItemsFromSQLite = () => async (dispatch, getState) => {
   try {
+    dispatch({ type: CART_LIST_REQUEST });
+
     const userId = getState().userLogin?.userInfo?._id;
     const items = await getCartFromSQLite();
 
-    const filtered = items.filter((item) => item.user === userId);
+    const filtered = items
+      .filter((item) => item.user === userId)
+      .map((item) => ({
+        _id: item.id,
+        user: item.user,
+        quantity: item.quantity,
+        createdAt: item.createdAt,
+        product: {
+          _id: item.product,
+          name: item.name,
+          price: item.price,
+          stock: item.stock,
+          images: [{ url: item.image }],
+        },
+      }));
 
-    console.log('[SQLite] Loaded filtered cart from local DB:', filtered);
-
-    // ❌ Don't dispatch to Redux
-    // dispatch({ type: CART_LIST_SUCCESS, payload: filtered });
-
+    dispatch({ type: CART_LIST_SUCCESS, payload: filtered });
   } catch (error) {
     console.error('[SQLite] Failed to get cart from local DB:', error.message);
+    dispatch({
+      type: CART_LIST_FAIL,
+      payload: 'Failed to load cart from local database.',
+    });
   }
 };
-

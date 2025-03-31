@@ -8,13 +8,18 @@ export const initDB = async () => {
   await db.execAsync(
     'CREATE TABLE IF NOT EXISTS tokenTable (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT);'
   );
+  // await db.execAsync(`DROP TABLE IF EXISTS cartTable;`);
 
   await db.execAsync(`
     CREATE TABLE IF NOT EXISTS cartTable (
       id TEXT PRIMARY KEY,
       user TEXT,
       product TEXT,
+      name TEXT,
+      price REAL,
+      stock INTEGER,
       quantity INTEGER,
+      image TEXT,
       createdAt TEXT
     );
   `);
@@ -85,17 +90,28 @@ export const upsertCartItemSQLite = async (cartItem) => {
   if (!db) db = await openDatabaseAsync('tokenDB');
 
   const user = cartItem.user;
-  const product = cartItem.product._id || cartItem.product;
+  const productId = cartItem.product._id || cartItem.product;
   const quantity = cartItem.quantity;
   const createdAt = cartItem.createdAt || new Date().toISOString();
 
+  const product = cartItem.product || {};
+  const name = product.name || '';
+  const price = product.price || 0;
+  const stock = product.stock || 1;
+  const image = product.images?.[0]?.url || '';
+
   await db.runAsync(
-    `INSERT OR REPLACE INTO cartTable (id, user, product, quantity, createdAt) VALUES (?, ?, ?, ?, ?)`,
-    [cartItem._id, user, product, quantity, createdAt]
+    `INSERT OR REPLACE INTO cartTable 
+     (id, user, product, name, price, stock, quantity, image, createdAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [cartItem._id, user, productId, name, price, stock, quantity, image, createdAt]
   );
 
-  console.log(`[SQLite] UPSERT -> user: ${user}, product: ${product}, quantity: ${quantity}`);
+  console.log(`[SQLite] UPSERT: ${name}, qty: ${quantity}`);
 };
+
+
+
 
 export const deleteCartItemSQLite = async (cartItemId) => {
   if (!db) db = await openDatabaseAsync('tokenDB');
