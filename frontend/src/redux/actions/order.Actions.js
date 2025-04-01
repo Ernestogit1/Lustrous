@@ -136,7 +136,7 @@ export const getCartItemsFromSQLite = () => async (dispatch, getState) => {
           images: [{ url: item.image }],
         },
       }));
-
+      console.log(`[SQLite] Cart for user ${userId}:`, filtered); 
     dispatch({ type: CART_LIST_SUCCESS, payload: filtered });
   } catch (error) {
     console.error('[SQLite] Failed to get cart from local DB:', error.message);
