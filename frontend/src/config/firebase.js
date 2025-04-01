@@ -26,7 +26,8 @@ const auth = getAuth(app);
 
 export const configureGoogleSignIn = () => {
   GoogleSignin.configure({
-    webClientId: "811935399178-4nd4ge7gufdiadboaksbkr91gcsh48m6.apps.googleusercontent.com", // ✅ This is correct
+    // webClientId: "811935399178-4nd4ge7gufdiadboaksbkr91gcsh48m6.apps.googleusercontent.com", 
+    webClientId: process.env.EXPO_PUBLIC_FIREBASE_WEB_CLIENT_ID,
     offlineAccess: true,
   });
 };

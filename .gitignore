@@ -15,3 +15,17 @@ backend/config/serviceAccountKey.json
 frontend/google-services.json
 frontend/google-services.json/
 /frontend/google-services.json
+
+
+# Ignore Expo and build configuration files
+frontend/app.json
+frontend/eas.json
+frontend/babel.config.js
+
+frontend/app.json/
+frontend/eas.json/
+frontend/babel.config.js/
+
+/frontend/app.json
+/frontend/eas.json
+/frontend/babel.config.js
