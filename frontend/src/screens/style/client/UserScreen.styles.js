@@ -8,6 +8,8 @@ export const COLORS = {
   lightPurple: '#C9B8E8', 
   lightPink: '#F9F1FD',
   mediumPink: '#F2D7ED',
+  gray: "#555",
+  white: "#fff",
 };
 
 export default StyleSheet.create({
@@ -220,6 +222,32 @@ export default StyleSheet.create({
     width: Dimensions.get("window").width, 
     height: "100%", 
     resizeMode: "cover", 
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 100,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    width: '90%',
+    alignSelf: 'center',
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: COLORS.gray,
   },
 });
 

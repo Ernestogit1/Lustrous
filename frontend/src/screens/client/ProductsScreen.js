@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllProducts } from '../../redux/actions/user.Actions';
 import { addToCart } from '../../redux/actions/order.Actions';
@@ -13,7 +13,10 @@ const ProductsScreen = ({ navigation }) => {
   const { loading, products, error } = useSelector((state) => state.productDetails);
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
 
-  const [sortOption, setSortOption] = useState('default'); 
+  const [searchQuery, setSearchQuery] = useState(''); 
+  const [filteredProducts, setFilteredProducts] = useState([]); 
+  const [minPrice, setMinPrice] = useState(''); 
+  const [maxPrice, setMaxPrice] = useState(''); 
 
   useEffect(() => {
     if (isFocused) {
@@ -21,15 +24,44 @@ const ProductsScreen = ({ navigation }) => {
     }
   }, [isFocused, dispatch]);
 
-  const sortedProducts = products?.slice().sort((a, b) => {
-    if (sortOption === 'lowToHigh') {
-      return a.price - b.price;
-    } else if (sortOption === 'highToLow') {
-      return b.price - a.price;
-    } else {
-      return a.name.localeCompare(b.name); 
+  // Filter products based on search query
+  useEffect(() => {
+    if (!products) return;
+
+    let filtered = products;
+
+    if (searchQuery.trim() !== '') {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter((product) => {
+        const matchesName = product.name.toLowerCase().includes(lowerCaseQuery);
+        const matchesCategory = product.category?.toLowerCase().includes(lowerCaseQuery);
+        const matchesPrice = product.price.toString().includes(lowerCaseQuery);
+        return matchesName || matchesCategory || matchesPrice;
+      });
     }
-  });
+
+    setFilteredProducts(filtered);
+  }, [searchQuery, products]);
+
+  const handlePriceFilter = () => {
+    if (!products) return;
+
+    const min = parseFloat(minPrice) || 0;
+    const max = parseFloat(maxPrice) || Infinity;
+
+    const filtered = products
+      .filter((product) => product.price >= min && product.price <= max)
+      .sort((a, b) => a.price - b.price); 
+
+    setFilteredProducts(filtered);
+  };
+
+
+  const handleClearFilter = () => {
+    setMinPrice('');
+    setMaxPrice('');
+    setFilteredProducts(products); 
+  };
 
   const renderProduct = ({ item }) => (
     <TouchableOpacity
@@ -75,57 +107,50 @@ const ProductsScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Filter Section */}
+      {/* Search Bar Section */}
+      <View style={styles.searchBarContainer}>
+        <Ionicons name="search" size={20} color={COLORS.gray} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name, category, or price"
+          placeholderTextColor={COLORS.gray}
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+      </View>
+
+      {/* Price Range Filter Section */}
       <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Sort by:</Text>
-        <View style={styles.filterButtons}>
+        <Text style={styles.filterLabel}>Filter by Price Range:</Text>
+        <View style={styles.priceRangeContainer}>
+          <TextInput
+            style={styles.priceInput}
+            placeholder="Min"
+            placeholderTextColor={COLORS.gray}
+            keyboardType="numeric"
+            value={minPrice}
+            onChangeText={(text) => setMinPrice(text)}
+          />
+          <Text style={styles.priceRangeSeparator}>-</Text>
+          <TextInput
+            style={styles.priceInput}
+            placeholder="Max"
+            placeholderTextColor={COLORS.gray}
+            keyboardType="numeric"
+            value={maxPrice}
+            onChangeText={(text) => setMaxPrice(text)}
+          />
           <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === 'default' && styles.filterButtonActive,
-            ]}
-            onPress={() => setSortOption('default')}
+            style={styles.filterButton}
+            onPress={handlePriceFilter}
           >
-            <Text
-              style={[
-                styles.filterButtonText,
-                sortOption === 'default' && styles.filterButtonTextActive,
-              ]}
-            >
-              Alphabetical
-            </Text>
+            <Text style={styles.filterButtonText}>Filter</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === 'lowToHigh' && styles.filterButtonActive,
-            ]}
-            onPress={() => setSortOption('lowToHigh')}
+            style={styles.clearButton}
+            onPress={handleClearFilter}
           >
-            <Text
-              style={[
-                styles.filterButtonText,
-                sortOption === 'lowToHigh' && styles.filterButtonTextActive,
-              ]}
-            >
-              Price: Low to High
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.filterButton,
-              sortOption === 'highToLow' && styles.filterButtonActive,
-            ]}
-            onPress={() => setSortOption('highToLow')}
-          >
-            <Text
-              style={[
-                styles.filterButtonText,
-                sortOption === 'highToLow' && styles.filterButtonTextActive,
-              ]}
-            >
-              Price: High to Low
-            </Text>
+            <Text style={styles.clearButtonText}>Clear</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -136,7 +161,7 @@ const ProductsScreen = ({ navigation }) => {
         <Text style={styles.error}>{error}</Text>
       ) : (
         <FlatList
-          data={sortedProducts}
+          data={filteredProducts}
           keyExtractor={(item) => item._id}
           renderItem={renderProduct}
           numColumns={2} 

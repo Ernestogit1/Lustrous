@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { 
   View, Text, TouchableOpacity, Image, 
-  ActivityIndicator, ScrollView, FlatList, Dimensions 
+  ActivityIndicator, ScrollView, FlatList, Dimensions, TextInput 
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../../redux/actions/auth.Actions"; 
@@ -11,15 +11,23 @@ import { LinearGradient } from "expo-linear-gradient";
 import { addToCart } from "../../redux/actions/order.Actions"; 
 import { useIsFocused } from '@react-navigation/native';
 
-
 import styles, { COLORS } from "../style/client/UserScreen.styles";
+
+// Define carousel images
+const carouselImages = [
+  require("../../../assets/home4.png"),
+  require("../../../assets/home5.png"),
+  require("../../../assets/home6.png"),
+];
 
 const UserScreen = ({ navigation }) => {
   const dispatch = useDispatch();
 
   const [selectedCategory, setSelectedCategory] = useState("All"); 
-  const [currentIndex, setCurrentIndex] = useState(0); // Track the current carousel index
-  const carouselRef = useRef(null); // Reference for the FlatList
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [filteredProducts, setFilteredProducts] = useState([]); 
+  const [currentIndex, setCurrentIndex] = useState(0); 
+  const carouselRef = useRef(null); 
   const isFocused = useIsFocused();
 
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
@@ -32,39 +40,45 @@ const UserScreen = ({ navigation }) => {
     }
   }, [isFocused, dispatch]);
 
-  // Handle logout
-  const handleLogout = () => {
-    dispatch(logoutUser());
-  };
-
-
-  const carouselImages = [
-    require("../../../assets/home4.png"),
-    require("../../../assets/home5.png"),
-    require("../../../assets/home6.png"),
-  ];
-
-
+  // Filter products based on search query and selected category
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % carouselImages.length; 
-        carouselRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-        return nextIndex;
+    if (!products) return;
+
+    let filtered = products;
+
+    if (selectedCategory !== "All") {
+      filtered = filtered.filter((product) => product.category === selectedCategory);
+    }
+
+    if (searchQuery.trim() !== "") {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter((product) => {
+        const matchesName = product.name.toLowerCase().includes(lowerCaseQuery);
+        const matchesCategory = product.category?.toLowerCase().includes(lowerCaseQuery);
+        const matchesPrice = product.price.toString().includes(lowerCaseQuery);
+        return matchesName || matchesCategory || matchesPrice;
       });
-    }, 3000); 
+    }
 
-    return () => clearInterval(interval); 
-  }, [carouselImages.length]);
-
-  const filteredProducts = selectedCategory === "All"
-    ? products
-    : products.filter((product) => product.category === selectedCategory);
+    setFilteredProducts(filtered);
+  }, [searchQuery, selectedCategory, products]);
 
   const categories = ["All", "Lip Products", "Foundation", "Palette", "Blush", "Tools"];
 
   return (
     <ScrollView style={styles.container}>
+      {/* Search Bar Section */}
+      <View style={styles.searchBarContainer}>
+        <Ionicons name="search" size={20} color={COLORS.gray} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name, category, or price"
+          placeholderTextColor={COLORS.gray}
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+        />
+      </View>
+
       {/* Carousel Section */}
       <View style={styles.carouselContainer}>
         <FlatList
@@ -81,33 +95,35 @@ const UserScreen = ({ navigation }) => {
       </View>
 
       {/* Categories Section */}
-      <View style={styles.categoriesContainer}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false} 
-          style={styles.categoriesScrollView}
-        >
-          {categories.map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryBtn,
-                selectedCategory === category && styles.categoryBtnActive,
-              ]}
-              onPress={() => setSelectedCategory(category)}
-            >
-              <Text
+      {searchQuery.trim() === "" && (
+        <View style={styles.categoriesContainer}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            style={styles.categoriesScrollView}
+          >
+            {categories.map((category) => (
+              <TouchableOpacity
+                key={category}
                 style={[
-                  styles.categoryText,
-                  selectedCategory === category && styles.categoryTextActive,
+                  styles.categoryBtn,
+                  selectedCategory === category && styles.categoryBtnActive,
                 ]}
+                onPress={() => setSelectedCategory(category)}
               >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+                <Text
+                  style={[
+                    styles.categoryText,
+                    selectedCategory === category && styles.categoryTextActive,
+                  ]}
+                >
+                  {category}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Featured Products Section */}
       <View style={styles.section}>
@@ -125,48 +141,48 @@ const UserScreen = ({ navigation }) => {
           </View>
         ) : filteredProducts && filteredProducts.length > 0 ? (
           <View style={styles.productsGrid}>
-          {filteredProducts.map((product) => (
-            <TouchableOpacity
-              key={product._id}
-              style={styles.gridProductCard}
-              onPress={() => navigation.navigate('ProductDetails', { product })} 
-            >
-              <View style={styles.gridProductImageContainer}>
-                {product.images && product.images.length > 0 ? (
-                  <Image 
-                    source={{ uri: product.images[0].url || product.images[0] }} 
-                    style={styles.gridProductImage}
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <LinearGradient
-                    colors={[COLORS.lightPink, COLORS.mediumPink]}
-                    style={styles.gridProductImagePlaceholder}
+            {filteredProducts.map((product) => (
+              <TouchableOpacity
+                key={product._id}
+                style={styles.gridProductCard}
+                onPress={() => navigation.navigate('ProductDetails', { product })} 
+              >
+                <View style={styles.gridProductImageContainer}>
+                  {product.images && product.images.length > 0 ? (
+                    <Image 
+                      source={{ uri: product.images[0].url || product.images[0] }} 
+                      style={styles.gridProductImage}
+                      resizeMode="cover"
+                    />
+                  ) : (
+                    <LinearGradient
+                      colors={[COLORS.lightPink, COLORS.mediumPink]}
+                      style={styles.gridProductImagePlaceholder}
+                    >
+                      <Text style={styles.placeholderText}>Product</Text>
+                    </LinearGradient>
+                  )}
+                </View>
+                <View style={styles.gridProductContent}>
+                  <Text style={styles.gridProductName} numberOfLines={1}>{product.name}</Text>
+                  <Text style={styles.gridProductPrice}>₱{product.price}</Text>
+                  
+                  {/* Add to Cart Button */}
+                  <TouchableOpacity
+                    style={styles.addToCartButton}
+                    onPress={() => {
+                      if (userInfo?._id) {
+                        dispatch(addToCart(product._id));
+                      }
+                    }}
                   >
-                    <Text style={styles.placeholderText}>Product</Text>
-                  </LinearGradient>
-                )}
-              </View>
-              <View style={styles.gridProductContent}>
-                <Text style={styles.gridProductName} numberOfLines={1}>{product.name}</Text>
-                <Text style={styles.gridProductPrice}>₱{product.price}</Text>
-                
-                {/* Add to Cart Button */}
-                <TouchableOpacity
-                   style={styles.addToCartButton}
-                   onPress={() => {
-                     if (userInfo?._id) {
-                      dispatch(addToCart(product._id));
-                    }
-                   }}
-                 >
-                   <Ionicons name="cart-outline" size={16} color="white" />
-                   <Text style={styles.addToCartText}>Add to Cart</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </View>
+                    <Ionicons name="cart-outline" size={16} color="white" />
+                    <Text style={styles.addToCartText}>Add to Cart</Text>
+                  </TouchableOpacity>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
         ) : (
           <Text style={styles.noProductsText}>No products available</Text>
         )}
