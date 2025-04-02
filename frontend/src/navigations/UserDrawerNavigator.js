@@ -3,9 +3,10 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons"; // Import Ionicons for the menu icon
 import UserScreen from "../screens/client/UserScreen"; // Home screen
 import ProfileScreen from "../screens/client/ProfileScreen"; // Profile screen
+import CartScreen from "../screens/client/CartScreen";
+import ProductsScreen from "../screens/client/ProductsScreen";
 import UserDrawer from "../components/UserDrawer";
 
-import CartScreen from "../screens/client/CartScreen";
 
 import { COLORS } from "../screens/style/client/UserDrawer.styles";
 
@@ -50,14 +51,14 @@ const UserDrawerNavigator = () => {
         name="Home"
         component={UserScreen}
         options={({ navigation }) => ({
-          drawerLabel: "Home", // Label for the drawer
+          drawerLabel: "Home", 
           headerLeft: () => (
             <Ionicons
               name="menu"
               size={24}
               color={COLORS.darkPurple}
               style={{ marginLeft: 16 }}
-              onPress={() => navigation.toggleDrawer()} // Toggle the drawer
+              onPress={() => navigation.toggleDrawer()} 
             />
           ),
         })}
@@ -67,14 +68,14 @@ const UserDrawerNavigator = () => {
         name="Profile"
         component={ProfileScreen}
         options={({ navigation }) => ({
-          drawerLabel: "Profile", // Label for the drawer
+          drawerLabel: "Profile", 
           headerLeft: () => (
             <Ionicons
               name="menu"
               size={24}
               color={COLORS.darkPurple}
               style={{ marginLeft: 16 }}
-              onPress={() => navigation.toggleDrawer()} // Toggle the drawer
+              onPress={() => navigation.toggleDrawer()} 
             />
           ),
         })}
@@ -85,6 +86,23 @@ const UserDrawerNavigator = () => {
         component={CartScreen}
         options={({ navigation }) => ({
           drawerLabel: "My Cart",
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={24}
+              color={COLORS.darkPurple}
+              style={{ marginLeft: 16 }}
+              onPress={() => navigation.toggleDrawer()}
+            />
+          ),
+        })}
+      />
+
+<Drawer.Screen
+        name="Products"
+        component={ProductsScreen}
+        options={({ navigation }) => ({
+          drawerLabel: "Products",
           headerLeft: () => (
             <Ionicons
               name="menu"

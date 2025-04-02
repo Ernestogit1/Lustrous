@@ -21,7 +21,7 @@
         "backgroundColor": "#ffffff"
       },
       "googleServicesFile": "./google-services.json",
-      "package": "com.yurinutella.frontend"
+      "package": "com.forborealis.frontend"
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +33,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "95d01ac1-1f28-4e9f-b4ac-c1371ca8ce31"
+        "projectId": "bc85162b-8429-4715-975f-28a100e64e39"
       }
     }
   }

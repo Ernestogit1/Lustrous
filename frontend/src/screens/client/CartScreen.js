@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import {
-  View, Text, Image, FlatList, StyleSheet,
-  TouchableOpacity, ActivityIndicator
+  View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator,
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import {  removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions'; // getCartItems {unused imports} 
-import { COLORS } from '../style/client/UserDrawer.styles';
+import { removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions';
 import { useIsFocused } from '@react-navigation/native';
+import styles, { COLORS } from '../style/client/CartScreen.styles';
 
 export default function CartScreen() {
   const dispatch = useDispatch();
@@ -17,11 +16,9 @@ export default function CartScreen() {
 
   useEffect(() => {
     if (isFocused && userInfo?._id) {
-      dispatch(getCartItemsFromSQLite());   // get from sqlite
-    //   dispatch(getCartItems());     // get from mongo db       
+      dispatch(getCartItemsFromSQLite());
     }
   }, [isFocused, dispatch, userInfo]);
-  
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
@@ -36,7 +33,7 @@ export default function CartScreen() {
           <TouchableOpacity
             style={[
               styles.qtyButton,
-              item.quantity === 1 && styles.disabledButton
+              item.quantity === 1 && styles.disabledButton,
             ]}
             onPress={() => dispatch(updateCartQuantity(item._id, 'decrease'))}
             disabled={item.quantity === 1}
@@ -49,7 +46,7 @@ export default function CartScreen() {
           <TouchableOpacity
             style={[
               styles.qtyButton,
-              item.quantity === item.product.stock && styles.disabledButton
+              item.quantity === item.product.stock && styles.disabledButton,
             ]}
             onPress={() => dispatch(updateCartQuantity(item._id, 'increase'))}
             disabled={item.quantity === item.product.stock}
@@ -63,7 +60,7 @@ export default function CartScreen() {
         onPress={() => dispatch(removeFromCart(item._id))}
         style={styles.removeButton}
       >
-        <Ionicons name="trash-outline" size={22} color="red" />
+        <Ionicons name="trash-outline" size={22} color="black" />
       </TouchableOpacity>
     </View>
   );
@@ -71,7 +68,7 @@ export default function CartScreen() {
   return (
     <View style={styles.container}>
       {loading ? (
-        <ActivityIndicator size="large" color={COLORS.darkPurple} />
+        <ActivityIndicator size="large" color={styles.loadingColor.color} />
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
       ) : (
@@ -79,79 +76,15 @@ export default function CartScreen() {
           data={cartItems}
           keyExtractor={(item) => item._id}
           renderItem={renderItem}
-          ListHeaderComponent={<Text style={styles.title}>🛒 My Cart</Text>}
-          ListEmptyComponent={<Text style={styles.empty}>Your cart is empty</Text>}
+          ListEmptyComponent={(
+            <View style={styles.emptyContainer}>
+              <Ionicons name="cart-outline" size={80} color={styles.emptyIcon.color} />
+              <Text style={styles.empty}>Your cart is empty</Text>
+            </View>
+          )}
           contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 20,
-    marginBottom: 15,
-    fontWeight: 'bold',
-    color: COLORS.darkPurple,
-  },
-  card: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.lightPurple,
-    marginBottom: 12,
-    padding: 10,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  productImage: {
-    width: 60,
-    height: 60,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  details: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: '600',
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  price: {
-    color: COLORS.mediumPurple,
-    marginBottom: 2,
-  },
-  quantityRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  qtyButton: {
-    backgroundColor: COLORS.darkPurple,
-    padding: 5,
-    borderRadius: 5,
-  },
-  qtyText: {
-    marginHorizontal: 10,
-    fontSize: 16,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
-  error: {
-    color: 'red',
-    marginTop: 15,
-    fontSize: 16,
-  },
-  empty: {
-    textAlign: 'center',
-    marginTop: 40,
-    fontSize: 16,
-    color: '#999',
-  },
-});

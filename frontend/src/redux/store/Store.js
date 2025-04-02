@@ -5,7 +5,7 @@ import { homeProductsReducer } from '../reducers/screens.Reducers';
 import { loadUser, initializeDatabase } from "../actions/auth.Actions";
 import { productDetailsReducer } from '../reducers/user.Reducers';
 import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
-import { cartReducer, cartListReducer } from '../reducers/order.Reducers';
+import { cartReducer, cartListReducer } from '../reducers/order.reducers';
 
 
 const rootReducer = combineReducers({
