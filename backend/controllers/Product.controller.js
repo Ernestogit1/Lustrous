@@ -144,7 +144,7 @@ const permanentDeleteProduct = async (req, res) => {
   }
 };
 
-
+// test
 const listTrashedProducts = async (req, res) => {
   try {
     const products = await Product.find({ deleted: true }).sort('-createdAt');

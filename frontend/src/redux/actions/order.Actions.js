@@ -7,6 +7,9 @@ import {
   CART_LIST_REQUEST,
   CART_LIST_SUCCESS,
   CART_LIST_FAIL,
+  ORDER_LIST_REQUEST,
+  ORDER_LIST_SUCCESS,
+  ORDER_LIST_FAIL,  
 } from '../constants/order.Constants';
 
 import {
@@ -16,7 +19,7 @@ import {
    upsertCartItemSQLite,
    deleteCartItemSQLite,
        
-  //  clearCartSQLite        
+   clearCartSQLite        
 } from "../../utils/sqliteHelper"; // ✅ adjust if path differs
 
 export const addToCart = (productId) => async (dispatch) => {
@@ -143,6 +146,49 @@ export const getCartItemsFromSQLite = () => async (dispatch, getState) => {
     dispatch({
       type: CART_LIST_FAIL,
       payload: 'Failed to load cart from local database.',
+    });
+  }
+};
+
+// ==========================================================================================
+// checkout
+
+export const checkoutOrder = () => async (dispatch, getState) => {
+  try {
+    const token = await getToken();
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    await axios.post(`${API_URL}/api/orders/checkout`, {}, config);
+    const userId = getState().userLogin?.userInfo?._id;
+
+    // ✅ clear SQLite cart
+    await clearCartSQLite(userId);
+
+    // ✅ clear Redux cart
+    dispatch({ type: CART_LIST_SUCCESS, payload: [] });
+
+    alert('Order placed successfully!');
+  } catch (err) {
+    console.error('[Checkout Error]', err.response?.data || err.message);
+    alert(err?.response?.data?.message || 'Checkout failed.');
+  }
+};
+
+// ==========================================================================================
+//  Order
+export const getMyOrders = () => async (dispatch) => {
+  try {
+    dispatch({ type: 'ORDER_LIST_REQUEST' });
+
+    const token = await getToken();
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    const { data } = await axios.get(`${API_URL}/api/orders/my-orders`, config);
+    dispatch({ type: 'ORDER_LIST_SUCCESS', payload: data.orders });
+  } catch (error) {
+    dispatch({
+      type: 'ORDER_LIST_FAIL',
+      payload: error.response?.data?.message || error.message,
     });
   }
 };

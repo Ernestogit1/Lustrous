@@ -48,7 +48,7 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, pushToken } = req.body;
     if (!idToken) {
       return res.status(400).json({ message: "ID token is required" });
     }
@@ -62,6 +62,11 @@ const loginUser = async (req, res) => {
       return res.status(401).json({ message: "User not found" });
     }
 
+    if (pushToken && pushToken !== user.pushToken) {
+      user.pushToken = pushToken;
+      await user.save();
+    }
+
     const token = generateToken(user._id, user.isAdmin);
 
     res.status(200).json({
@@ -72,6 +77,7 @@ const loginUser = async (req, res) => {
         email: user.email,
         firebaseUid: user.firebaseUid,
         isAdmin: user.isAdmin,
+        pushToken: user.pushToken,
       },
       token,
     });
@@ -85,7 +91,7 @@ const loginUser = async (req, res) => {
 
 const googleLoginUser = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { idToken, pushToken  } = req.body;
     if (!idToken) {
       return res.status(400).json({ message: "ID token is required" });
     }
@@ -94,7 +100,8 @@ const googleLoginUser = async (req, res) => {
     const firebaseUid = decodedToken.uid;
 
     let user = await User.findOne({ firebaseUid });
-
+    
+   
     if (!user) {
       const firebaseUser = await admin.auth().getUser(firebaseUid);
 
@@ -112,6 +119,11 @@ const googleLoginUser = async (req, res) => {
       await user.save();
     }
 
+    if (pushToken && pushToken !== user.pushToken) {
+      user.pushToken = pushToken;
+    }
+    await user.save();
+
     const token = generateToken(user._id, user.isAdmin);
 
     res.status(200).json({
@@ -123,6 +135,7 @@ const googleLoginUser = async (req, res) => {
         firebaseUid: user.firebaseUid,
         isAdmin: user.isAdmin,
         avatar: user.avatar,
+        pushToken: user.pushToken,
       },
       token,
     });
@@ -145,4 +158,8 @@ const getUserProfile = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, getUserProfile, googleLoginUser };
+
+
+
+
+module.exports = { registerUser, loginUser, getUserProfile, googleLoginUser  };

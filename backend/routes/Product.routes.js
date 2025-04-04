@@ -5,7 +5,7 @@ const { upload } = require('../config/cloudinary');
 const router = express.Router();
 
 
-
+// test
 router.put('/delete/:id', softDeleteProduct);
 router.put('/restore/:id', restoreProduct);
 router.delete('/permanent-delete/:id', permanentDeleteProduct);

@@ -6,6 +6,7 @@ import ProfileScreen from "../screens/client/ProfileScreen"; // Profile screen
 import CartScreen from "../screens/client/CartScreen";
 import ProductsScreen from "../screens/client/ProductsScreen";
 import UserDrawer from "../components/UserDrawer";
+import OrderDetailsScreen from '../screens/client/OrderDetailsScreen';
 
 
 import { COLORS } from "../screens/style/client/UserDrawer.styles";
@@ -103,6 +104,22 @@ const UserDrawerNavigator = () => {
         component={ProductsScreen}
         options={({ navigation }) => ({
           drawerLabel: "Products",
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={24}
+              color={COLORS.darkPurple}
+              style={{ marginLeft: 16 }}
+              onPress={() => navigation.toggleDrawer()}
+            />
+          ),
+        })}
+      />
+      <Drawer.Screen
+        name="Orders"
+        component={OrderDetailsScreen}
+        options={({ navigation }) => ({
+          drawerLabel: "My Orders",
           headerLeft: () => (
             <Ionicons
               name="menu"

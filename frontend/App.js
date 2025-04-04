@@ -4,12 +4,19 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, SafeAreaView, ActivityIndicator } from 'react-native';
 import { useFonts } from 'expo-font';
+
+import { navigationRef } from './src/utils/navigationRef';
 import { NavigationContainer } from '@react-navigation/native';
+
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider, useSelector } from 'react-redux';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Correct import
 import { configureGoogleSignIn } from './src/config/firebase';
+
+// helper
+import { setupNotificationListener, removeNotificationListener } from './src/utils/notificationHelper';
+
 
 
 // Store
@@ -21,8 +28,10 @@ import RegisterScreen from './src/screens/RegisterScreen';
 import LoginScreen from './src/screens/LoginScreen';
 // User Drawer Navigator
 import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
-// User Stack Navigator Screens
-import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; // Add ProductDetailsScreen
+// User screens
+import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; 
+import CheckoutScreen from './src/screens/client/CheckoutScreen';
+
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
@@ -34,7 +43,7 @@ SplashScreen.preventAutoHideAsync();
 
 const AdminStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
-const UserStack = createNativeStackNavigator(); // Add UserStack for ProductDetails
+const UserStack = createNativeStackNavigator(); 
 
 // Auth Navigator
 function AuthNavigator() {
@@ -71,6 +80,15 @@ function UserNavigator() {
           headerTitle: "",
         }}
       />
+
+      <UserStack.Screen
+          name="Checkout"
+          component={CheckoutScreen}
+          options={{
+            headerShown: true,
+            headerTitle: "Checkout",
+          }}
+        />
     </UserStack.Navigator>
   );
 }
@@ -89,7 +107,7 @@ function MainNavigator() {
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar style="auto" />
       {!userInfo ? <AuthNavigator /> : isAdmin ? <AdminNavigator /> : <UserNavigator />}
     </NavigationContainer>
@@ -104,6 +122,11 @@ export default function App() {
     'Poppins-Bold': require('./assets/font/Poppins-Bold.ttf'),
     'Poppins-SemiBold': require('./assets/font/Poppins-SemiBold.ttf'),
   });
+
+  useEffect(() => {
+    setupNotificationListener();
+    return () => removeNotificationListener();
+  }, []);
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {

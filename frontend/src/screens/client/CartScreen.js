@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import {
-  View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator,
+  View, Text, Image, FlatList, TouchableOpacity, ActivityIndicator,  
 } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { Ionicons } from '@expo/vector-icons';
-import { removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions';
-import { useIsFocused } from '@react-navigation/native';
+import { removeFromCart, updateCartQuantity, getCartItemsFromSQLite } from '../../redux/actions/order.Actions'; // getCartItems {unused imports} 
+  import { useIsFocused, useNavigation } from '@react-navigation/native';
 import styles, { COLORS } from '../style/client/CartScreen.styles';
 
 export default function CartScreen() {
+  const navigation = useNavigation();
   const dispatch = useDispatch();
   const isFocused = useIsFocused();
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
@@ -16,7 +17,9 @@ export default function CartScreen() {
 
   useEffect(() => {
     if (isFocused && userInfo?._id) {
-      dispatch(getCartItemsFromSQLite());
+      dispatch(getCartItemsFromSQLite());  // get from sqlite
+          //   dispatch(getCartItems());     // get from mongo db       
+
     }
   }, [isFocused, dispatch, userInfo]);
 
@@ -54,6 +57,8 @@ export default function CartScreen() {
             <Ionicons name="add" size={18} color="white" />
           </TouchableOpacity>
         </View>
+
+        
       </View>
 
       <TouchableOpacity
@@ -62,7 +67,10 @@ export default function CartScreen() {
       >
         <Ionicons name="trash-outline" size={22} color="black" />
       </TouchableOpacity>
+    
+
     </View>
+    
   );
 
   return (
@@ -85,6 +93,12 @@ export default function CartScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}
+        <TouchableOpacity
+        style={[styles.checkoutButton, { marginTop: 10 }]}
+        onPress={() => navigation.navigate('Checkout')}
+      >
+        <Text style={styles.checkoutText}>Go to Checkout</Text>
+      </TouchableOpacity>
     </View>
   );
 }

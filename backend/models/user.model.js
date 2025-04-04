@@ -39,7 +39,7 @@ const UserSchema = new mongoose.Schema(
        type: Boolean, 
        default: false 
       },
-    fcmToken: {
+    pushToken: {
        type: String,
         default: '' 
       },

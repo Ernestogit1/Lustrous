@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { Platform } from 'react-native';
+// import { Platform } from 'react-native';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries

@@ -11,6 +11,8 @@ import { USER_REGISTER_REQUEST,
  import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential   } from "firebase/auth";
  import { auth } from "../../config/firebase"; 
 import { storeToken, removeToken, getToken, initDB } from "../../utils/sqliteHelper";
+import { registerPushNotifAsync } from '../../utils/notificationHelper';
+
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 import { API_URL } from "@env";
@@ -61,12 +63,15 @@ export const loginUser = (email, password) => async (dispatch) => {
     dispatch({ type: USER_LOGIN_REQUEST });
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const idToken = await userCredential.user.getIdToken();
-
-
+    console.log('Push Token Registering...');
+    const pushToken = await registerPushNotifAsync();
+    console.log('Push Token Registered:', pushToken);
     const config = { headers: { "Content-Type": "application/json" } };
-    const { data } = await axios.post(`${API_URL}/api/auth/login`, { idToken  }, config);
+    const { data } = await axios.post(`${API_URL}/api/auth/login`, { idToken, pushToken,  }, config);
+
     await storeToken(data.token);
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
+
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -84,6 +89,8 @@ export const googleLogin = () => async (dispatch) => {
 
     const userInfo = await GoogleSignin.signIn();
     const { idToken, accessToken } = await GoogleSignin.getTokens();
+    const pushToken = await registerPushNotifAsync();
+
 
     const googleCredential = GoogleAuthProvider.credential(idToken, accessToken);
 
@@ -91,11 +98,11 @@ export const googleLogin = () => async (dispatch) => {
     const firebaseIdToken = await firebaseUserCredential.user.getIdToken();
 
     const config = { headers: { "Content-Type": "application/json" } };
-    const { data } = await axios.post(`${API_URL}/api/auth/google-login`, { idToken: firebaseIdToken }, config);
+    const { data } = await axios.post(`${API_URL}/api/auth/google-login`, { idToken: firebaseIdToken,  pushToken, }, config);
 
     await storeToken(data.token);
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
-
+    await registerFCMToken(); 
   } catch (error) {
     console.log("Google Login Error", error);
     dispatch({ type: USER_LOGIN_FAIL, payload: error.message });

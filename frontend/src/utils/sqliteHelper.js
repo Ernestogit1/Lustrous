@@ -45,33 +45,35 @@ export const removeToken = async () => {
   await db.runAsync('DELETE FROM tokenTable;');
 };
 
+// =====================================================================================================
+// CART FUNCTIONS
 // add to cart
-export const saveCartToSQLite = async (cartItems) => {
-  if (!db) db = await openDatabaseAsync('tokenDB');
+// export const saveCartToSQLite = async (cartItems) => {
+//   if (!db) db = await openDatabaseAsync('tokenDB');
 
-  console.log('[SQLite] Saving cart to local DB...');
-  await db.runAsync(`DELETE FROM cartTable;`);
+//   console.log('[SQLite] Saving cart to local DB...');
+//   await db.runAsync(`DELETE FROM cartTable;`);
 
- for (const item of cartItems) {
-  const user = item.user;
-  const product = item.product._id || item.product;
-  const quantity = item.quantity;
+// for (const item of cartItems) {
+//   const user = item.user;
+//   const product = item.product._id || item.product;
+//   const quantity = item.quantity;
 
-  console.log(`[SQLite] Saving item -> user: ${user}, product: ${product}, quantity: ${quantity}`);
+//   console.log(`[SQLite] Saving item -> user: ${user}, product: ${product}, quantity: ${quantity}`);
 
-  await db.runAsync(
-    `INSERT INTO cartTable (id, user, product, quantity, createdAt) VALUES (?, ?, ?, ?, ?)`,
-    [
-      item._id,
-      user,
-      product,
-      quantity,
-      item.createdAt || new Date().toISOString()
-    ]
-  );
-}
-};
-
+//   await db.runAsync(
+//     `INSERT INTO cartTable (id, user, product, quantity, createdAt) VALUES (?, ?, ?, ?, ?)`,
+//     [
+//       item._id,
+//       user,
+//       product,
+//       quantity,
+//       item.createdAt || new Date().toISOString()
+//     ]
+//   );
+// }
+// };
+// Get cart
 export const getCartFromSQLite = async () => {
   if (!db) db = await openDatabaseAsync('tokenDB');
   const result = await db.getAllAsync(`SELECT * FROM cartTable;`);
@@ -79,13 +81,8 @@ export const getCartFromSQLite = async () => {
   return result;
 };
 
-export const clearCartSQLite = async () => {
-  if (!db) db = await openDatabaseAsync('tokenDB');
-  await db.runAsync(`DELETE FROM cartTable;`);
-  console.log('[SQLite] Cleared local cart 🧹');
-};
 
-
+// update and insert
 export const upsertCartItemSQLite = async (cartItem) => {
   if (!db) db = await openDatabaseAsync('tokenDB');
 
@@ -102,19 +99,26 @@ export const upsertCartItemSQLite = async (cartItem) => {
 
   await db.runAsync(
     `INSERT OR REPLACE INTO cartTable 
-     (id, user, product, name, price, stock, quantity, image, createdAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    (id, user, product, name, price, stock, quantity, image, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [cartItem._id, user, productId, name, price, stock, quantity, image, createdAt]
   );
-
+  
   console.log(`[SQLite] UPSERT: ${name}, qty: ${quantity}`);
 };
 
 
 
-
+// delete cart
 export const deleteCartItemSQLite = async (cartItemId) => {
   if (!db) db = await openDatabaseAsync('tokenDB');
   await db.runAsync(`DELETE FROM cartTable WHERE id = ?`, [cartItemId]);
   console.log(`[SQLite] Deleted item from local DB -> id: ${cartItemId}`);
+};
+
+//  clear after checkout cart
+export const clearCartSQLite = async (userId) => {
+  if (!db) db = await openDatabaseAsync('tokenDB');
+  await db.runAsync(`DELETE FROM cartTable WHERE user = ?`, [userId]);
+  console.log(`[SQLite] Cleared cart for user ${userId}`);
 };
