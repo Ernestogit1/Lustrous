@@ -286,6 +286,63 @@ const removeFromCart = async (req, res) => {
     }
   };
 
+  // ======================={ADMIN SIDE}========================
+  const updateOrderStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+  
+      const order = await Order.findById(id).populate('user', 'name pushToken');
+      if (!order) return res.status(404).json({ message: 'Order not found' });
+  
+      order.status = status;
+      await order.save();
+  
+      await sendPushNotification(order.user._id, {
+        title: '📦 Order Status Updated',
+        body: `Your order ${order._id} is now "${status}"`,
+        data: { screen: 'OrderDetail', orderId: order._id.toString() }
+      });
+  
+      res.status(200).json({ message: 'Order status updated', order });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to update order status', error: err.message });
+    }
+  };
+  const getAllOrdersForAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({
+        status: { $nin: ['Completed', 'Cancelled'] },
+      })
+        .populate('user', 'name pushToken')
+        .populate('products.product', 'name images');
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch admin orders', error: err.message });
+    }
+  };
+
+  const getCancelledOrdersAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({
+        status: 'Cancelled'
+      })
+        .sort({ createdAt: -1 })
+        .populate('user', 'name email') // ✅ show user info
+        .populate({ path: 'products.product', select: 'name images price' });
+  
+      console.log('[ADMIN] All Cancelled Orders:', orders);
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      console.error('[getCancelledOrdersAdmin] Failed:', err.message);
+      res.status(500).json({ message: 'Failed to fetch cancelled orders', error: err.message });
+    }
+  };
+  
+  
+  
 module.exports = { 
   addToCart, 
   getCartItems, 
@@ -295,5 +352,8 @@ module.exports = {
   updatePushToken, 
   getUserOrders,
   cancelOrder,
-  getSingleUserOrder
+  getSingleUserOrder,
+  updateOrderStatus,
+  getAllOrdersForAdmin,
+  getCancelledOrdersAdmin
 };

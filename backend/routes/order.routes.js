@@ -8,12 +8,15 @@ const {
      updatePushToken, 
      getUserOrders,
      cancelOrder,
-     getSingleUserOrder  
+     getSingleUserOrder,
+     getAllOrdersForAdmin,
+    updateOrderStatus,
+    getCancelledOrdersAdmin 
     } = require('../controllers/order.controller');
 const isAuthenticated = require('../middleware/auth.middleware');
 
 const router = express.Router();
-// order:
+// order
 router.get('/my-orders', isAuthenticated, getUserOrders);
 
 
@@ -21,12 +24,19 @@ router.get('/my-orders', isAuthenticated, getUserOrders);
 router.put('/update-push-token', isAuthenticated, updatePushToken);
 // checkout
 router.post('/checkout', isAuthenticated, checkoutOrder);
-// add to cart
+//  cart
 router.post('/cart', isAuthenticated, addToCart);
 router.get('/cart', isAuthenticated, getCartItems);
 
-// =========================================================================
-// Orders ID
+//====================={ADMIN}========================
+router.get('/admin/all-orders', isAuthenticated, getAllOrdersForAdmin);
+router.put('/admin/update-status/:id', isAuthenticated, updateOrderStatus);
+router.get('/admin/cancelled-orders', isAuthenticated, getCancelledOrdersAdmin);
+
+
+
+//====================={ORDERS ID}========================
+
 router.delete('/cart/:id', isAuthenticated, removeFromCart);
 router.put('/cart/:id', isAuthenticated, updateCartQuantity);
 
