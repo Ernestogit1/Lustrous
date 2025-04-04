@@ -11,7 +11,8 @@ const {
      getSingleUserOrder,
      getAllOrdersForAdmin,
     updateOrderStatus,
-    getCancelledOrdersAdmin 
+    getCancelledOrdersAdmin,
+    getCompletedOrdersAdmin 
     } = require('../controllers/order.controller');
 const isAuthenticated = require('../middleware/auth.middleware');
 
@@ -32,6 +33,7 @@ router.get('/cart', isAuthenticated, getCartItems);
 router.get('/admin/all-orders', isAuthenticated, getAllOrdersForAdmin);
 router.put('/admin/update-status/:id', isAuthenticated, updateOrderStatus);
 router.get('/admin/cancelled-orders', isAuthenticated, getCancelledOrdersAdmin);
+router.get('/admin/completed-orders', isAuthenticated, getCompletedOrdersAdmin);
 
 
 

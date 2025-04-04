@@ -40,16 +40,35 @@ export const getAdminOrders = () => async (dispatch) => {
         headers: { Authorization: `Bearer ${token}` },
       });
   
-      console.log('[Cancelled Orders Response]', data.orders); // ✅ log output
       dispatch({ type: ADMIN_ORDERS_SUCCESS, payload: data.orders });
     } catch (error) {
-      console.error('[Cancelled Orders Error]', error.response?.data || error.message); // ✅ better error
       dispatch({
         type: ADMIN_ORDERS_FAIL,
         payload: error.response?.data?.message || error.message,
       });
     }
   };
+
+  export const getCompletedOrdersOnly = () => async (dispatch) => {
+    try {
+      dispatch({ type: ADMIN_ORDERS_REQUEST });
+  
+      const token = await getToken();
+      if (!token) throw new Error('No token found');
+  
+      const { data } = await axios.get(`${API_URL}/api/orders/admin/completed-orders`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      dispatch({ type: ADMIN_ORDERS_SUCCESS, payload: data.orders });
+    } catch (error) {
+      dispatch({
+        type: ADMIN_ORDERS_FAIL,
+        payload: error.response?.data?.message || error.message,
+      });
+    }
+  };
+  
   
   
   export const updateOrderStatus = (orderId, status) => async (dispatch) => {

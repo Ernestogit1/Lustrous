@@ -9,6 +9,7 @@ import UpdateProduct from '../screens/server/Product/Product.Update';
 import ProductTrash from '../screens/server/Product/Product.Trash';
 import orderUpdate from '../screens/server/Order/OrderStatusUpdateScreen';
 import orderCancle from '../screens/server/Order/OrderCancleScreen';
+import orderDelivered from '../screens/server/Order/OrderCompletedScreen';
 
 
 const Drawer = createDrawerNavigator();
@@ -31,6 +32,7 @@ export default function AdminSideBar() {
       <Drawer.Screen name="Trash" component={ProductTrash} />
       <Drawer.Screen name="Orders" component={orderUpdate} />
       <Drawer.Screen name="CancelledOrders" component={orderCancle} />
+      <Drawer.Screen name="DeliveredOrders" component={orderDelivered} />
       <Drawer.Screen name="Logout" component={LogoutScreen} />
       <Drawer.Screen
         name="UpdateProduct"

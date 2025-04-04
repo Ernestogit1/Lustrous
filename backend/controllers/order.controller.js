@@ -332,12 +332,25 @@ const removeFromCart = async (req, res) => {
         .populate('user', 'name email') // ✅ show user info
         .populate({ path: 'products.product', select: 'name images price' });
   
-      console.log('[ADMIN] All Cancelled Orders:', orders);
   
       res.status(200).json({ orders });
     } catch (err) {
-      console.error('[getCancelledOrdersAdmin] Failed:', err.message);
       res.status(500).json({ message: 'Failed to fetch cancelled orders', error: err.message });
+    }
+  };
+
+  const getCompletedOrdersAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({ status: 'Completed' })
+        .sort({ createdAt: -1 })
+        .populate('user', 'name email')
+        .populate({ path: 'products.product', select: 'name images price' });
+  
+
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch completed orders', error: err.message });
     }
   };
   
@@ -355,5 +368,6 @@ module.exports = {
   getSingleUserOrder,
   updateOrderStatus,
   getAllOrdersForAdmin,
-  getCancelledOrdersAdmin
+  getCancelledOrdersAdmin,
+  getCompletedOrdersAdmin
 };
