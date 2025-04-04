@@ -31,6 +31,10 @@ import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
 // User screens
 import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; 
 import CheckoutScreen from './src/screens/client/CheckoutScreen';
+import EditProfileScreen from './src/screens/client/EditProfileScreen';
+import ProfileScreen from './src/screens/client/ProfileScreen';
+import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
+
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -89,6 +93,31 @@ function UserNavigator() {
             headerTitle: "Checkout",
           }}
         />
+
+      <UserStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="EditPassword"
+        component={EditPasswordScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
     </UserStack.Navigator>
   );
 }

@@ -6,6 +6,9 @@ import { USER_REGISTER_REQUEST,
   USER_LOGIN_SUCCESS,
   USER_LOGIN_FAIL,
   USER_LOGOUT,
+  USER_UPDATE_REQUEST,
+  USER_UPDATE_SUCCESS,
+  USER_UPDATE_FAIL,
   
  } from "../constants/auth.Constants";
  import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential   } from "firebase/auth";
@@ -113,3 +116,4 @@ export const logoutUser = () => async (dispatch) => {
   await removeToken();
     dispatch({ type: USER_LOGOUT });
 };
+

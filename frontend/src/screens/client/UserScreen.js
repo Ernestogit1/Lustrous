@@ -40,6 +40,10 @@ const UserScreen = ({ navigation }) => {
     }
   }, [isFocused, dispatch]);
 
+  const handleLogout = () => {
+    dispatch(logoutUser());
+  };
+  
   // Filter products based on search query and selected category
   useEffect(() => {
     if (!products) return;

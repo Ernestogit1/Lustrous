@@ -46,8 +46,9 @@ const UserDrawerNavigator = () => {
         },
       }}
     >
-      {/* Home Drawer Item */}
-      <Drawer.Screen
+
+   {/* Home Drawer Item */}
+   <Drawer.Screen
         name="Home"
         component={UserScreen}
         options={({ navigation }) => ({
@@ -63,6 +64,23 @@ const UserDrawerNavigator = () => {
           ),
         })}
       />
+      <Drawer.Screen
+        name="Products"
+        component={ProductsScreen}
+        options={({ navigation }) => ({
+          drawerLabel: "Products",
+          headerLeft: () => (
+            <Ionicons
+              name="menu"
+              size={24}
+              color={COLORS.darkPurple}
+              style={{ marginLeft: 16 }}
+              onPress={() => navigation.toggleDrawer()}
+            />
+          ),
+        })}
+      />
+
       {/* Profile Drawer Item */}
       <Drawer.Screen
         name="Profile"
@@ -81,6 +99,7 @@ const UserDrawerNavigator = () => {
         })}
       />
 
+
       <Drawer.Screen
         name="Cart"
         component={CartScreen}
@@ -98,22 +117,6 @@ const UserDrawerNavigator = () => {
         })}
       />
 
-      <Drawer.Screen
-        name="Products"
-        component={ProductsScreen}
-        options={({ navigation }) => ({
-          drawerLabel: "Products",
-          headerLeft: () => (
-            <Ionicons
-              name="menu"
-              size={24}
-              color={COLORS.darkPurple}
-              style={{ marginLeft: 16 }}
-              onPress={() => navigation.toggleDrawer()}
-            />
-          ),
-        })}
-      />
       <Drawer.Screen
         name="Orders"
         component={OrderTabs}
