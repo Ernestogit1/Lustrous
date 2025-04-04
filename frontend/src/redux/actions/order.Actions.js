@@ -153,7 +153,7 @@ export const getCartItemsFromSQLite = () => async (dispatch, getState) => {
 // ==========================================================================================
 // checkout
 
-export const checkoutOrder = () => async (dispatch, getState) => {
+export const checkoutOrder = (onSuccess) => async (dispatch, getState) => {
   try {
     const token = await getToken();
     const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -161,18 +161,17 @@ export const checkoutOrder = () => async (dispatch, getState) => {
     await axios.post(`${API_URL}/api/orders/checkout`, {}, config);
     const userId = getState().userLogin?.userInfo?._id;
 
-    // ✅ clear SQLite cart
     await clearCartSQLite(userId);
-
-    // ✅ clear Redux cart
     dispatch({ type: CART_LIST_SUCCESS, payload: [] });
 
     alert('Order placed successfully!');
+    if (onSuccess) onSuccess(); 
   } catch (err) {
     console.error('[Checkout Error]', err.response?.data || err.message);
     alert(err?.response?.data?.message || 'Checkout failed.');
   }
 };
+
 
 // ==========================================================================================
 //  Order

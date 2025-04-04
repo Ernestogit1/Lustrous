@@ -93,12 +93,14 @@ export default function CartScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
         />
       )}
-        <TouchableOpacity
+      {Array.isArray(cartItems) && cartItems.length > 0 && (
+      <TouchableOpacity
         style={[styles.checkoutButton, { marginTop: 10 }]}
         onPress={() => navigation.navigate('Checkout')}
       >
         <Text style={styles.checkoutText}>Go to Checkout</Text>
       </TouchableOpacity>
+    )}
     </View>
   );
 }

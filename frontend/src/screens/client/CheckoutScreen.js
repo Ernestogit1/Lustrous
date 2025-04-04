@@ -7,13 +7,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../style/client/UserDrawer.styles';
 
 export default function CheckoutScreen({ navigation }) {
-  const { cartItems } = useSelector((state) => state.cartList);
+  const cartItems = useSelector((state) => state.cartList?.cartItems) || [];
   const dispatch = useDispatch();
 
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
 
   const SHIPPING_FEE = 50;
-  const total = cartItems.reduce((acc, item) => acc + item.product.price * item.quantity, 0);
+  const total = cartItems?.reduce?.((acc, item) => acc + item.product.price * item.quantity, 0) || 0;
   const grandTotal = total + SHIPPING_FEE;
 
   return (
@@ -66,12 +66,16 @@ export default function CheckoutScreen({ navigation }) {
       {/* Action Buttons */}
       <View style={styles.buttonRow}>
      
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => dispatch(checkoutOrder())}
->
-          <Text style={styles.buttonText}>Proceed to Checkout</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={() => {
+          dispatch(checkoutOrder(() => {
+            navigation.navigate('UserDrawer', { screen: 'Cart' });
+          }));
+        }}
+      >
+        <Text style={styles.buttonText}>Proceed to Checkout</Text>
+      </TouchableOpacity>
       </View>
     </ScrollView>
   );

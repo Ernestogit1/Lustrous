@@ -102,7 +102,6 @@ export const googleLogin = () => async (dispatch) => {
 
     await storeToken(data.token);
     dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
-    await registerFCMToken(); 
   } catch (error) {
     console.log("Google Login Error", error);
     dispatch({ type: USER_LOGIN_FAIL, payload: error.message });
