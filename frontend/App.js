@@ -90,7 +90,7 @@ function UserNavigator() {
           component={CheckoutScreen}
           options={{
             headerShown: true,
-            headerTitle: "Checkout",
+            headerTitle: "",
           }}
         />
 

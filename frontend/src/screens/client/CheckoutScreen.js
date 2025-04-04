@@ -1,15 +1,13 @@
-
 import React from 'react';
-import { View, Text, Image, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { useSelector,useDispatch  } from 'react-redux';
+import { View, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
 import { checkoutOrder } from '../../redux/actions/order.Actions';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../style/client/UserDrawer.styles';
+import styles from '../style/client/CheckoutScreen.styles';
 
 export default function CheckoutScreen({ navigation }) {
   const cartItems = useSelector((state) => state.cartList?.cartItems) || [];
   const dispatch = useDispatch();
-
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
 
   const SHIPPING_FEE = 50;
@@ -17,92 +15,104 @@ export default function CheckoutScreen({ navigation }) {
   const grandTotal = total + SHIPPING_FEE;
 
   return (
-    <ScrollView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>🧾 Checkout Summary</Text>
-      </View>
-
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.contentContainer}
+    >
+      
       {/* User Info */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👤 Customer Info</Text>
-        <Text style={styles.info}>Name: {userInfo?.name}</Text>
-        <Text style={styles.info}>Email: {userInfo?.email}</Text>
-        <Text style={styles.info}>Phone: {userInfo?.phoneNumber || 'N/A'}</Text>
-        <Text style={styles.info}>Address: {userInfo?.address || 'N/A'}</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="person-circle" size={22} color={styles.iconColor.color} />
+          <Text style={styles.cardTitle}>Delivery Information</Text>
+        </View>
+        
+        <View style={styles.cardBody}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Name:</Text>
+            <Text style={styles.infoValue}>{userInfo?.name}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Phone:</Text>
+            <Text style={styles.infoValue}>{userInfo?.phoneNumber || 'Not provided'}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Address:</Text>
+            <Text style={styles.infoValue}>{userInfo?.address || 'Not provided'}</Text>
+          </View>
+        </View>
       </View>
 
       {/* Cart Items */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🛒 Products</Text>
-        {cartItems.map((item) => (
-          <View key={item._id} style={styles.product}>
-            <Image source={{ uri: item.product.images[0]?.url }} style={styles.productImage} />
-            <View style={styles.productDetails}>
-              <Text style={styles.name}>{item.product.name}</Text>
-              <Text>₱{item.product.price} × {item.quantity}</Text>
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="cart" size={22} color={styles.iconColor.color} />
+          <Text style={styles.cardTitle}>Order Items</Text>
+        </View>
+        
+        <View style={styles.cardBody}>
+          {cartItems.map((item) => (
+            <View key={item._id} style={styles.productCard}>
+              <Image 
+                source={{ uri: item.product.images[0]?.url }} 
+                style={styles.productImage} 
+              />
+              <View style={styles.productDetails}>
+                <Text style={styles.productName}>{item.product.name}</Text>
+                <Text style={styles.productPrice}>₱{item.product.price.toFixed(2)}</Text>
+                <View style={styles.quantityContainer}>
+                  <Text style={styles.quantityText}>Quantity: {item.quantity}</Text>
+                  <Text style={styles.itemTotal}>
+                    ₱{(item.product.price * item.quantity).toFixed(2)}
+                  </Text>
+                </View>
+              </View>
             </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Order Summary */}
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <Ionicons name="calculator" size={22} color={styles.iconColor.color} />
+          <Text style={styles.cardTitle}>Order Summary</Text>
+        </View>
+        
+        <View style={styles.cardBody}>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Items Total:</Text>
+            <Text style={styles.summaryValue}>₱{total.toFixed(2)}</Text>
           </View>
-        ))}
-      </View>
-
-      {/* Summary */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>💳 Order Summary</Text>
-        <View style={styles.summaryRow}>
-          <Text>Total:</Text>
-          <Text>₱{total.toFixed(2)}</Text>
-        </View>
-        <View style={styles.summaryRow}>
-          <Text>Shipping Fee:</Text>
-          <Text>₱{SHIPPING_FEE.toFixed(2)}</Text>
-        </View>
-        <View style={styles.summaryRow}>
-          <Text style={styles.grandTotalLabel}>Grand Total:</Text>
-          <Text style={styles.grandTotalValue}>₱{grandTotal.toFixed(2)}</Text>
+          
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Shipping Fee:</Text>
+            <Text style={styles.summaryValue}>₱{SHIPPING_FEE.toFixed(2)}</Text>
+          </View>
+          
+          <View style={styles.divider} />
+          
+          <View style={styles.grandTotalRow}>
+            <Text style={styles.grandTotalLabel}>Grand Total:</Text>
+            <Text style={styles.grandTotalValue}>₱{grandTotal.toFixed(2)}</Text>
+          </View>
         </View>
       </View>
 
-      {/* Action Buttons */}
-      <View style={styles.buttonRow}>
-     
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => {
-          dispatch(checkoutOrder(() => {
-            navigation.navigate('UserDrawer', { screen: 'Cart' });
-          }));
-        }}
-      >
-        <Text style={styles.buttonText}>Proceed to Checkout</Text>
-      </TouchableOpacity>
+      {/* Action Button */}
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.checkoutButton}
+          onPress={() => {
+            dispatch(checkoutOrder(() => {
+              navigation.navigate('UserDrawer', { screen: 'Cart' });
+            }));
+          }}
+        >
+          <Text style={styles.checkoutButtonText}>Place Order</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  header: { marginBottom: 15 },
-  title: { fontSize: 22, fontWeight: 'bold', color: COLORS.darkPurple },
-  section: { marginBottom: 20 },
-  sectionTitle: { fontSize: 18, fontWeight: '600', marginBottom: 10, color: COLORS.mediumPurple },
-  info: { fontSize: 14, marginBottom: 4 },
-  product: { flexDirection: 'row', marginBottom: 10, alignItems: 'center' },
-  productImage: { width: 50, height: 50, borderRadius: 6, marginRight: 10 },
-  productDetails: { flex: 1 },
-  name: { fontSize: 16, fontWeight: '500' },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginVertical: 4 },
-  grandTotalLabel: { fontWeight: 'bold' },
-  grandTotalValue: { fontWeight: 'bold', color: COLORS.darkPurple },
-  buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 },
-  button: {
-    flex: 1,
-    backgroundColor: COLORS.darkPurple,
-    padding: 12,
-    borderRadius: 6,
-    alignItems: 'center',
-    marginHorizontal: 5,
-  },
-  buttonText: { color: '#fff', fontWeight: '600' },
-});

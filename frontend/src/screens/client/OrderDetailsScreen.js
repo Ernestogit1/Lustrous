@@ -1,95 +1,148 @@
-import React, { useEffec, useCallback  } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useCallback } from 'react';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMyOrders, cancelOrder  } from '../../redux/actions/order.Actions';
-import { useFocusEffect } from '@react-navigation/native'; 
-const OrderDetailsScreen = () => {
+import { getMyOrders, cancelOrder } from '../../redux/actions/order.Actions';
+import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import styles, { COLORS } from '../style/client/OrderDetailsScreen.styles';
+
+const OrderDetailsScreen = ({ route }) => {
   const dispatch = useDispatch();
   const { orders, loading } = useSelector(state => state.orderList);
+  const orderId = route?.params?.orderId;
 
   useFocusEffect(
     useCallback(() => {
       dispatch(getMyOrders());
     }, [dispatch])
   );
-  if (loading) return <Text style={styles.loader}>Loading orders...</Text>;
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const order = orderId 
+    ? orders?.find(order => order._id === orderId) 
+    : null;
+  const dataToDisplay = order ? [order] : orders;
+
+  const getStatusIcon = (status) => {
+    switch(status) {
+      case 'Order Placed':
+        return <Ionicons name="time-outline" size={20} color={COLORS.warning} />;
+      case 'Completed':
+        return <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />;
+      case 'Cancelled':
+        return <Ionicons name="close-circle" size={20} color={COLORS.error} />;
+      case 'Processing':
+        return <Ionicons name="sync-outline" size={20} color={COLORS.info} />;
+      default:
+        return <Ionicons name="help-circle" size={20} color={COLORS.gray} />;
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color={COLORS.darkPurple} />
+        <Text style={styles.loaderText}>Loading order details...</Text>
+      </View>
+    );
+  }
 
   return (
-    <FlatList
-      data={orders}
-      keyExtractor={(order) => order._id}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Text style={styles.status}>Status: {item.status}</Text>
-          <Text style={styles.total}>Total: ₱{item.totalAmount}</Text>
-
-          {item.products.map(({ product, quantity }) => (
-            <View key={product._id} style={styles.item}>
-              <Image source={{ uri: product.images[0]?.url }} style={styles.image} />
-              <View style={styles.info}>
-                <Text style={styles.name}>{product.name}</Text>
-                <Text style={styles.qty}>Qty: {quantity}</Text>
+    <View style={styles.container}>
+      <FlatList
+        data={dataToDisplay}
+        keyExtractor={(order) => order._id}
+        renderItem={({ item }) => (
+          <View style={styles.card}>
+            {/* Order Header */}
+            <View style={styles.orderHeader}>
+              <View>
+                <Text style={styles.orderId}>Order #{item._id.slice(-6)}</Text>
+                <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
+              </View>
+              <View style={[
+                styles.statusContainer, 
+                { backgroundColor: item.status === 'Completed' ? COLORS.lightGreen : 
+                                 item.status === 'Cancelled' ? COLORS.lightRed : 
+                                 COLORS.lightYellow }
+              ]}>
+                {getStatusIcon(item.status)}
+                <Text style={[
+                  styles.statusText,
+                  { color: item.status === 'Completed' ? COLORS.success :
+                           item.status === 'Cancelled' ? COLORS.error :
+                           COLORS.warning }
+                ]}>{item.status}</Text>
               </View>
             </View>
-          ))}
+            
+            <View style={styles.divider} />
+            
+            {/* Products Section */}
+            <View style={styles.sectionHeader}>
+              <Ionicons name="cart" size={18} color={COLORS.darkPurple} />
+              <Text style={styles.sectionTitle}>Order Items</Text>
+            </View>
+            
+            {item.products.map(({ product, quantity }) => (
+              <View key={product._id} style={styles.productItem}>
+                <Image source={{ uri: product.images[0]?.url }} style={styles.productImage} />
+                <View style={styles.productInfo}>
+                  <Text style={styles.productName}>{product.name}</Text>
+                  <View style={styles.productDetails}>
+                    <Text style={styles.productPrice}>₱{product.price.toFixed(2)}</Text>
+                    <Text style={styles.productQuantity}>Qty: {quantity}</Text>
+                  </View>
+                  <Text style={styles.itemTotal}>
+                    Item Total: ₱{(product.price * quantity).toFixed(2)}
+                  </Text>
+                </View>
+              </View>
+            ))}
+            
+            <View style={styles.divider} />
+            
+            {/* Payment Info */}
+            <View style={styles.sectionHeader}>
+              <Ionicons name="card" size={18} color={COLORS.darkPurple} />
+              <Text style={styles.sectionTitle}>Payment Details</Text>
+            </View>
+            
+            <View style={styles.paymentInfo}>
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentLabel}>Subtotal:</Text>
+                <Text style={styles.paymentValue}>₱{(item.totalAmount - 50).toFixed(2)}</Text>
+              </View>
+              <View style={styles.paymentRow}>
+                <Text style={styles.paymentLabel}>Shipping Fee:</Text>
+                <Text style={styles.paymentValue}>₱50.00</Text>
+              </View>
+              <View style={styles.totalRow}>
+                <Text style={styles.totalLabel}>Total:</Text>
+                <Text style={styles.totalValue}>₱{item.totalAmount.toFixed(2)}</Text>
+              </View>
+            </View>
 
-          {item.status === 'Order Placed' && (
-          <TouchableOpacity
-          style={styles.cancelBtn}
-          onPress={() => dispatch(cancelOrder(item._id))}
-        >
-          <Text style={styles.cancelText}>Cancel Order</Text>
-        </TouchableOpacity>
-        
-          )}
-        </View>
-      )}
-    />
+            {/* Cancel Button (if order is pending) */}
+            {item.status === 'Order Placed' && (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => dispatch(cancelOrder(item._id))}
+              >
+                <Ionicons name="close-circle" size={18} color={COLORS.white} />
+                <Text style={styles.cancelButtonText}>Cancel Order</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        )}
+        contentContainerStyle={{ paddingBottom: 20 }}
+      />
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  loader: { marginTop: 40, textAlign: 'center' },
-  card: {
-    backgroundColor: '#fff',
-    margin: 10,
-    padding: 14,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  status: {
-    fontWeight: 'bold',
-    marginBottom: 4,
-    color: '#6200ee',
-  },
-  total: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
-  item: {
-    flexDirection: 'row',
-    marginVertical: 6,
-  },
-  image: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    marginRight: 10,
-  },
-  info: { justifyContent: 'center' },
-  name: { fontWeight: '600' },
-  qty: { color: '#777' },
-  cancelBtn: {
-    backgroundColor: '#e53935',
-    paddingVertical: 8,
-    borderRadius: 5,
-    marginTop: 10,
-    alignItems: 'center',
-  },
-  cancelText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-});
 
 export default OrderDetailsScreen;

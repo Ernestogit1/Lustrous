@@ -1,69 +1,90 @@
 import React, { useCallback } from 'react';
-import { View, Text, FlatList, Image, StyleSheet } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getMyOrders } from '../../redux/actions/order.Actions';
 import { useFocusEffect } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import styles, { COLORS } from '../style/client/CancelOrderScreen.styles';
 
-const CancelOrderScreen = () => {
+const CancelOrderScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { orders, loading } = useSelector((state) => state.orderList);
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getMyOrders('Cancelled')); // Fetch only cancelled
+      dispatch(getMyOrders('Cancelled')); 
     }, [dispatch])
   );
 
-  if (loading) return <Text style={styles.loader}>Loading cancelled orders...</Text>;
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const renderEmptyList = () => (
+    <View style={styles.emptyContainer}>
+      <Ionicons name="close-circle-outline" size={80} color={COLORS.mediumGray} />
+      <Text style={styles.emptyText}>No cancelled orders</Text>
+    </View>
+  );
 
   return (
-    <FlatList
-      data={orders}
-      keyExtractor={(order) => order._id}
-      renderItem={({ item }) => (
-        <View style={styles.card}>
-          <Text style={styles.status}>Status: {item.status}</Text>
-          <Text style={styles.total}>Total: ₱{item.totalAmount}</Text>
-
-          {item.products.map(({ product, quantity }) => (
-            <View key={product._id} style={styles.item}>
-              <Image source={{ uri: product.images[0]?.url }} style={styles.image} />
-              <View style={styles.info}>
-                <Text style={styles.name}>{product.name}</Text>
-                <Text style={styles.qty}>Qty: {quantity}</Text>
-              </View>
-            </View>
-          ))}
+    <View style={styles.container}>
+      {loading ? (
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={COLORS.error} />
+          <Text style={styles.loaderText}>Loading cancelled orders...</Text>
         </View>
+      ) : (
+        <FlatList
+          data={orders}
+          keyExtractor={(order) => order._id}
+          ListEmptyComponent={renderEmptyList}
+          contentContainerStyle={orders.length === 0 ? { flex: 1 } : { paddingBottom: 20 }}
+          renderItem={({ item }) => (
+            <View style={styles.card}>
+              <View style={styles.orderHeader}>
+                <View>
+                  <Text style={styles.orderId}>Order #{item._id.slice(-6)}</Text>
+                  <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
+                </View>
+                <View style={styles.statusContainer}>
+                  <Ionicons name="close-circle" size={16} color={COLORS.error} />
+                  <Text style={styles.statusText}>{item.status}</Text>
+                </View>
+              </View>
+
+              <View style={styles.divider} />
+              
+              {item.products.map(({ product, quantity }) => (
+                <View key={product._id} style={styles.productItem}>
+                  <Image 
+                    source={{ uri: product.images[0]?.url }} 
+                    style={styles.productImage}
+                  />
+                  <View style={styles.productInfo}>
+                    <Text style={styles.productName}>{product.name}</Text>
+                    <View style={styles.productDetails}>
+                      <Text style={styles.productPrice}>₱{product.price.toFixed(2)}</Text>
+                      <Text style={styles.productQuantity}>Qty: {quantity}</Text>
+                    </View>
+                  </View>
+                </View>
+              ))}
+              
+              <View style={styles.divider} />
+              
+              <View style={styles.orderSummary}>
+                <Text style={styles.totalItems}>{item.products.length} item(s)</Text>
+                <Text style={styles.totalAmount}>Total: ₱{item.totalAmount.toFixed(2)}</Text>
+              </View>
+              
+            </View>
+          )}
+        />
       )}
-    />
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  loader: { marginTop: 40, textAlign: 'center' },
-  card: {
-    backgroundColor: '#fff',
-    margin: 10,
-    padding: 14,
-    borderRadius: 8,
-    elevation: 2,
-  },
-  status: { fontWeight: 'bold', marginBottom: 4, color: '#d32f2f' },
-  total: { fontSize: 16, marginBottom: 8 },
-  item: {
-    flexDirection: 'row',
-    marginVertical: 6,
-  },
-  image: {
-    width: 50,
-    height: 50,
-    borderRadius: 6,
-    marginRight: 10,
-  },
-  info: { justifyContent: 'center' },
-  name: { fontWeight: '600' },
-  qty: { color: '#777' },
-});
 
 export default CancelOrderScreen;
