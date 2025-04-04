@@ -23,6 +23,9 @@ import LoginScreen from './src/screens/LoginScreen';
 import UserDrawerNavigator from './src/navigations/UserDrawerNavigator';
 // User Stack Navigator Screens
 import ProductDetailsScreen from './src/screens/client/ProductDetailsScreen'; // Add ProductDetailsScreen
+import EditProfileScreen from './src/screens/client/EditProfileScreen';
+import ProfileScreen from './src/screens/client/ProfileScreen';
+import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
 
@@ -66,6 +69,30 @@ function UserNavigator() {
       <UserStack.Screen
         name="ProductDetails"
         component={ProductDetailsScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="EditProfile"
+        component={EditProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="EditPassword"
+        component={EditPasswordScreen}
         options={{
           headerShown: true,
           headerTitle: "",

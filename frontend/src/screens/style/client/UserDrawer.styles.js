@@ -22,12 +22,10 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40, 
-    borderWidth: 2,
-    borderColor: COLORS.darkPurple,
     backgroundColor: COLORS.mediumPurple, 
   },
   userName: {
-    fontSize: 18,
+    fontSize: 14,
     fontFamily: "Poppins-Bold",
     marginTop: 10,
     color: COLORS.darkPurple,

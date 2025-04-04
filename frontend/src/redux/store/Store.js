@@ -3,7 +3,7 @@ import {thunk} from "redux-thunk";
 import { authRegisterReducer, authLoginReducer } from "../reducers/auth.Reducers";
 import { homeProductsReducer } from '../reducers/screens.Reducers';
 import { loadUser, initializeDatabase } from "../actions/auth.Actions";
-import { productDetailsReducer } from '../reducers/user.Reducers';
+import { productDetailsReducer, userUpdateReducer, changePasswordReducer } from '../reducers/user.Reducers';
 import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
 import { cartReducer, cartListReducer } from '../reducers/order.reducers';
 
@@ -13,7 +13,8 @@ const rootReducer = combineReducers({
   userLogin: authLoginReducer,
   homeProducts: homeProductsReducer,
   productDetails: productDetailsReducer,
-
+  userUpdate: userUpdateReducer,
+  changePassword: changePasswordReducer,
 
   // transaction
   cart: cartReducer,
