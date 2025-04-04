@@ -1,18 +1,20 @@
-import React, { useEffec, useCallback  } from 'react';
+import React, { useCallback } from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { getMyOrders, cancelOrder  } from '../../redux/actions/order.Actions';
-import { useFocusEffect } from '@react-navigation/native'; 
-const OrderDetailsScreen = () => {
+import { getMyOrders } from '../../redux/actions/order.Actions';
+import { useFocusEffect } from '@react-navigation/native';
+
+const CompletedOrderScreen = () => {
   const dispatch = useDispatch();
-  const { orders, loading } = useSelector(state => state.orderList);
+  const { orders, loading } = useSelector((state) => state.orderList);
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getMyOrders());
+      dispatch(getMyOrders('Completed')); // only fetch completed orders
     }, [dispatch])
   );
-  if (loading) return <Text style={styles.loader}>Loading orders...</Text>;
+
+  if (loading) return <Text style={styles.loader}>Loading completed orders...</Text>;
 
   return (
     <FlatList
@@ -33,15 +35,9 @@ const OrderDetailsScreen = () => {
             </View>
           ))}
 
-          {item.status === 'Order Placed' && (
-          <TouchableOpacity
-          style={styles.cancelBtn}
-          onPress={() => dispatch(cancelOrder(item._id))}
-        >
-          <Text style={styles.cancelText}>Cancel Order</Text>
-        </TouchableOpacity>
-        
-          )}
+          <TouchableOpacity style={styles.reviewBtn}>
+            <Text style={styles.reviewText}>Review Order</Text>
+          </TouchableOpacity>
         </View>
       )}
     />
@@ -57,15 +53,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     elevation: 2,
   },
-  status: {
-    fontWeight: 'bold',
-    marginBottom: 4,
-    color: '#6200ee',
-  },
-  total: {
-    fontSize: 16,
-    marginBottom: 8,
-  },
+  status: { fontWeight: 'bold', marginBottom: 4, color: '#388e3c' },
+  total: { fontSize: 16, marginBottom: 8 },
   item: {
     flexDirection: 'row',
     marginVertical: 6,
@@ -79,17 +68,17 @@ const styles = StyleSheet.create({
   info: { justifyContent: 'center' },
   name: { fontWeight: '600' },
   qty: { color: '#777' },
-  cancelBtn: {
-    backgroundColor: '#e53935',
+  reviewBtn: {
+    backgroundColor: '#6200ee',
     paddingVertical: 8,
     borderRadius: 5,
     marginTop: 10,
     alignItems: 'center',
   },
-  cancelText: {
+  reviewText: {
     color: '#fff',
     fontWeight: '600',
   },
 });
 
-export default OrderDetailsScreen;
+export default CompletedOrderScreen;

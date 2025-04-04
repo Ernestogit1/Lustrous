@@ -176,12 +176,15 @@ export const checkoutOrder = () => async (dispatch, getState) => {
 
 // ==========================================================================================
 //  Order
-export const getMyOrders = () => async (dispatch) => {
+export const getMyOrders = (status = 'Order Placed,Shipped') => async (dispatch) => {
   try {
     dispatch({ type: 'ORDER_LIST_REQUEST' });
 
     const token = await getToken();
-    const config = { headers: { Authorization: `Bearer ${token}` } };
+    const config = { 
+      headers: { Authorization: `Bearer ${token}` },
+      params: { status }  
+    };
 
     const { data } = await axios.get(`${API_URL}/api/orders/my-orders`, config);
     dispatch({ type: 'ORDER_LIST_SUCCESS', payload: data.orders });
@@ -192,3 +195,20 @@ export const getMyOrders = () => async (dispatch) => {
     });
   }
 };
+
+
+
+export const cancelOrder = (orderId) => async (dispatch) => {
+  try {
+    const token = await getToken();
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    await axios.put(`${API_URL}/api/orders/cancel/${orderId}`, {}, config);
+
+    dispatch(getMyOrders()); // Refresh order list after cancel
+  } catch (error) {
+    console.log('[CancelOrder Error]', error.response?.data || error.message);
+    alert(error.response?.data?.message || 'Cancel failed.');
+  }
+};
+

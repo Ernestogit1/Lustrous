@@ -6,7 +6,8 @@ const {
     updateCartQuantity, 
     checkoutOrder,
      updatePushToken, 
-     getUserOrders   
+     getUserOrders,
+     cancelOrder   
     } = require('../controllers/order.controller');
 const isAuthenticated = require('../middleware/auth.middleware');
 
@@ -24,5 +25,9 @@ router.post('/cart', isAuthenticated, addToCart);
 router.get('/cart', isAuthenticated, getCartItems);
 router.delete('/cart/:id', isAuthenticated, removeFromCart);
 router.put('/cart/:id', isAuthenticated, updateCartQuantity);
+
+// cancle order
+router.put('/cancel/:id', isAuthenticated, cancelOrder);
+
 
 module.exports = router;

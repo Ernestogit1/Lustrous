@@ -212,26 +212,60 @@ const removeFromCart = async (req, res) => {
     res.status(200).json({ message: 'Expo push token updated successfully' });
   };
 
-
   const getUserOrders = async (req, res) => {
     try {
       const userId = req.user?.userId || req.user?._id;
   
+      const statusParam = req.query.status;
+      let statusFilter;
+  
+      if (!statusParam) {
+        statusFilter = ['Order Placed', 'Shipped']; // default
+      } else if (Array.isArray(statusParam)) {
+        statusFilter = statusParam;
+      } else {
+        statusFilter = statusParam.split(',');
+      }
+  
       const orders = await Order.find({
         user: userId,
-        status: { $in: ['Order Placed', 'Shipped'] },
+        status: { $in: statusFilter },
       })
         .sort({ createdAt: -1 })
-        .populate({
-          path: 'products.product',
-          select: 'name images price',
-        });
+        .populate({ path: 'products.product', select: 'name images price' });
   
       res.status(200).json({ orders });
     } catch (err) {
       res.status(500).json({ message: 'Failed to fetch orders', error: err.message });
     }
   };
+  
+  
+  
+  const cancelOrder = async (req, res) => {
+    try {
+      const userId = req.user?.userId || req.user?._id;
+      const { id } = req.params;
+  
+      console.log('[CancelOrder]', { userId, orderId: id });
+  
+      const order = await Order.findOne({ _id: id, user: userId });
+  
+      if (!order || order.status !== 'Order Placed') {
+        console.log('[CancelOrder] Order not found or not cancellable', order?.status);
+        return res.status(400).json({ message: 'Only "Order Placed" can be cancelled.' });
+      }
+  
+      order.status = 'Cancelled';
+      await order.save();
+  
+      res.status(200).json({ message: 'Order cancelled successfully' });
+    } catch (err) {
+      console.error('[CancelOrder] Server Error', err.message);
+      res.status(500).json({ message: 'Failed to cancel order', error: err.message });
+    }
+  };
+  
   
 
 module.exports = { 
@@ -241,5 +275,6 @@ module.exports = {
   updateCartQuantity, 
   checkoutOrder, 
   updatePushToken, 
-  getUserOrders
+  getUserOrders,
+  cancelOrder
 };

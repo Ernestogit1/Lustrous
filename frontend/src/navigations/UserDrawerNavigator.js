@@ -6,8 +6,7 @@ import ProfileScreen from "../screens/client/ProfileScreen"; // Profile screen
 import CartScreen from "../screens/client/CartScreen";
 import ProductsScreen from "../screens/client/ProductsScreen";
 import UserDrawer from "../components/UserDrawer";
-import OrderDetailsScreen from '../screens/client/OrderDetailsScreen';
-
+import OrderTabs from '../navigations/OrderTabs';
 
 import { COLORS } from "../screens/style/client/UserDrawer.styles";
 
@@ -99,7 +98,7 @@ const UserDrawerNavigator = () => {
         })}
       />
 
-<Drawer.Screen
+      <Drawer.Screen
         name="Products"
         component={ProductsScreen}
         options={({ navigation }) => ({
@@ -117,7 +116,7 @@ const UserDrawerNavigator = () => {
       />
       <Drawer.Screen
         name="Orders"
-        component={OrderDetailsScreen}
+        component={OrderTabs}
         options={({ navigation }) => ({
           drawerLabel: "My Orders",
           headerLeft: () => (

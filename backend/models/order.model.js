@@ -15,7 +15,7 @@ const OrderSchema = new mongoose.Schema({
   totalAmount: { type: Number, required: true },
   status: {
     type: String,
-    enum: ['Order Placed', 'Shipped', 'Completed', 'Canceled'],
+    enum: ['Order Placed', 'Shipped', 'Completed', 'Cancelled'],
     default: 'Order Placed',
   },
 }, { timestamps: true });
