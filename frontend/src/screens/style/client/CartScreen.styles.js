@@ -7,7 +7,11 @@ export const COLORS = {
   lightPink: "#F9F1FD",
   mediumPink: "#F2D7ED",
   gray: "#555",
+  mediumGray: "#B0B0B0",
+  lightGray: "#F5F7FA",
   white: "#fff",
+  red: "#FF4D4D",
+  black: "#000",
 };
 
 const styles = StyleSheet.create({
@@ -29,7 +33,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     marginBottom: 12,
     padding: 15,
-    borderRadius: 15,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -79,8 +82,13 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: COLORS.mediumPink,
   },
-  removeButton: {
-    marginLeft: 10,
+  deleteButton: {
+    backgroundColor: COLORS.red,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignContent: 'center',
+    width: 70,
+    height: '92%',
   },
   error: {
     color: COLORS.gray,
@@ -105,6 +113,70 @@ const styles = StyleSheet.create({
   },
   loadingColor: {
     color: COLORS.darkPurple,
+  },
+  subtotalContainer: {
+    backgroundColor: COLORS.lightGray,
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  subtotalRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  subtotalText: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: COLORS.gray,
+  },
+  subtotalTitle: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: COLORS.black,
+  },
+  subtotalDivider: {
+    height: 1,
+    backgroundColor: COLORS.mediumGray,
+    marginVertical: 10,
+  },
+  checkoutButton: {
+    backgroundColor: COLORS.darkPurple,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  checkoutText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
+  },
+  checkbox: {
+    marginRight: 10,
+    alignSelf: 'center',
+  },
+  selectAllButton: {
+    backgroundColor: COLORS.mediumPurple,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  selectAllText: {
+    color: COLORS.white,
+    fontSize: 16,
+    fontFamily: 'Poppins-Medium',
   },
 });
 

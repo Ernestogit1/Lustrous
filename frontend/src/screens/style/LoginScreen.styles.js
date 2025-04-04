@@ -8,6 +8,7 @@ export const COLORS = {
   mediumPink: '#E1AFD1',
   lightPurple: '#AD88C6',
   darkPurple: '#7469B6',
+  white: "#fff",
 };
 
 export default StyleSheet.create({
@@ -139,5 +140,31 @@ export default StyleSheet.create({
     marginBottom: 15,
     fontSize: 14,
     fontFamily: 'Poppins-Medium'
+  },
+  googleButton: {
+    backgroundColor: COLORS.white,
+    borderRadius: 50,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+    marginBottom: 10,
+    elevation: 2,
+  },
+  googleButtonContent: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  googleLogo: {
+    width: 25,
+    height: 25,
+    marginRight: 10,
+  },
+  googleButtonText: {
+    fontSize: 16,
+    fontFamily: "Poppins-Medium",
+    color: COLORS.gray,
   },
 });

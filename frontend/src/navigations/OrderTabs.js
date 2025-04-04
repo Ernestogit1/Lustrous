@@ -11,7 +11,7 @@ const OrderTabs = () => (
     screenOptions={{
       lazy: true, // ensures only active screen renders
       swipeEnabled: true, // enable proper swipe gestures
-      tabBarLabelStyle: { fontSize: 14, fontWeight: 'bold' },
+      tabBarLabelStyle: { fontSize: 15, fontFamily: 'Poppins-SemiBold' },
       tabBarIndicatorStyle: { backgroundColor: '#6200ee', height: 3 },
       tabBarActiveTintColor: '#6200ee',
       tabBarInactiveTintColor: '#999',
@@ -22,8 +22,8 @@ const OrderTabs = () => (
     }}
   >
     <Tab.Screen name="My Orders" component={OrderDetailsScreen} />
-    <Tab.Screen name="Cancelled Orders" component={CancelOrderScreen} />
-    <Tab.Screen name="Completed Orders" component={CompletedOrderScreen} />
+    <Tab.Screen name="Cancelled" component={CancelOrderScreen} />
+    <Tab.Screen name="Completed" component={CompletedOrderScreen} />
 
   </Tab.Navigator>
 );

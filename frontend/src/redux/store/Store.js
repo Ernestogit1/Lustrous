@@ -5,7 +5,7 @@
   import { loadUser, initializeDatabase } from "../actions/auth.Actions";
   import { productDetailsReducer, userUpdateReducer, changePasswordReducer } from '../reducers/user.Reducers';
     import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
-  import { cartReducer, cartListReducer, orderListReducer } from '../reducers/order.Reducers';
+  import { cartReducer, cartListReducer, orderListReducer } from '../reducers/order.reducers';
 
 
   const rootReducer = combineReducers({
