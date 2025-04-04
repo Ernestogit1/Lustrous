@@ -2,6 +2,7 @@ import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import OrderDetailsScreen from '../screens/client/OrderDetailsScreen';
 import CancelOrderScreen from '../screens/client/CancleOrderScreen';
+import CompletedOrderScreen from '../screens/client/CompletedOrderScreen';
 
 const Tab = createMaterialTopTabNavigator();
 
@@ -22,6 +23,8 @@ const OrderTabs = () => (
   >
     <Tab.Screen name="My Orders" component={OrderDetailsScreen} />
     <Tab.Screen name="Cancelled Orders" component={CancelOrderScreen} />
+    <Tab.Screen name="Completed Orders" component={CompletedOrderScreen} />
+
   </Tab.Navigator>
 );
 
