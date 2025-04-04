@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Lustrous",
+    "slug": "frontend",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/lustrous.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/lustrous.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "googleServicesFile": "./google-services.json",
+      "package": "com.yurinutella.frontend",
+      "useNextNotificationsApi": true,
+      "permissions": [
+        "NOTIFICATIONS"
+      ]
+    },
+    "notification": {
+      "icon": "./assets/lustrous.png",
+      "color": "#6200ee"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-sqlite",
+      "@react-native-google-signin/google-signin",
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "173e9d5f-2440-493d-9b69-29609317041d"
+      }
+    },
+    "owner": "yurinutella"
+  }
+}

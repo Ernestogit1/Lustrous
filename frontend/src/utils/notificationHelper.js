@@ -19,9 +19,18 @@ export const setupNotificationListener = () => {
   if (notificationListener) return;
 
   notificationListener = Notifications.addNotificationResponseReceivedListener(response => {
-    const { screen, orderId } = response.notification.request.content.data;
-    if (screen && orderId && navigationRef.isReady()) {
-      navigationRef.navigate(screen, { orderId });
+    const { screen, orderId } = response.notification.request.content.data || {};
+
+    console.log('[Notification] Tapped:', { screen, orderId });
+    console.log('📍 Nav ref ready?', navigationRef.isReady());
+
+    if (screen && navigationRef.isReady()) {
+      if (orderId) {
+        console.log('🔁 Navigating to', screen, 'with orderId', orderId);
+        navigationRef.navigate(screen, { orderId });
+      } else {
+        navigationRef.navigate(screen);
+      }
     }
   });
 };

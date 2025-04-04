@@ -10,6 +10,9 @@ import {
   ORDER_LIST_REQUEST,
   ORDER_LIST_SUCCESS,
   ORDER_LIST_FAIL,  
+  SINGLE_ORDER_REQUEST,
+  SINGLE_ORDER_SUCCESS,
+  SINGLE_ORDER_FAIL,
 } from '../constants/order.Constants';
 
 import {
@@ -177,7 +180,7 @@ export const checkoutOrder = (onSuccess) => async (dispatch, getState) => {
 //  Order
 export const getMyOrders = (status = 'Order Placed,Shipped') => async (dispatch) => {
   try {
-    dispatch({ type: 'ORDER_LIST_REQUEST' });
+    dispatch({ type: ORDER_LIST_REQUEST });
 
     const token = await getToken();
     const config = { 
@@ -186,10 +189,10 @@ export const getMyOrders = (status = 'Order Placed,Shipped') => async (dispatch)
     };
 
     const { data } = await axios.get(`${API_URL}/api/orders/my-orders`, config);
-    dispatch({ type: 'ORDER_LIST_SUCCESS', payload: data.orders });
+    dispatch({ type: ORDER_LIST_SUCCESS, payload: data.orders });
   } catch (error) {
     dispatch({
-      type: 'ORDER_LIST_FAIL',
+      type: ORDER_LIST_FAIL,
       payload: error.response?.data?.message || error.message,
     });
   }
@@ -204,10 +207,31 @@ export const cancelOrder = (orderId) => async (dispatch) => {
 
     await axios.put(`${API_URL}/api/orders/cancel/${orderId}`, {}, config);
 
-    dispatch(getMyOrders()); // Refresh order list after cancel
+    dispatch(getMyOrders()); 
   } catch (error) {
     console.log('[CancelOrder Error]', error.response?.data || error.message);
     alert(error.response?.data?.message || 'Cancel failed.');
+  }
+};
+
+
+export const getSingleOrder = (orderId) => async (dispatch) => {
+  try {
+    dispatch({ type: SINGLE_ORDER_REQUEST });
+
+    const token = await getToken();
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    const { data } = await axios.get(`${API_URL}/api/orders/my-orders/${orderId}`, config);
+    dispatch({ type: SINGLE_ORDER_SUCCESS, payload: data.order });
+
+  } catch (err) {
+    dispatch({
+      type: SINGLE_ORDER_FAIL,
+      payload: err.response?.data?.message || err.message,
+    });
   }
 };
 

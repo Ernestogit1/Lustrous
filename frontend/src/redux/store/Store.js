@@ -5,7 +5,7 @@
   import { loadUser, initializeDatabase } from "../actions/auth.Actions";
   import { productDetailsReducer, userUpdateReducer, changePasswordReducer } from '../reducers/user.Reducers';
     import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
-  import { cartReducer, cartListReducer, orderListReducer } from '../reducers/order.Reducers';
+  import { cartReducer, cartListReducer, orderListReducer, singleOrderReducer  } from '../reducers/order.Reducers';
 
 
   const rootReducer = combineReducers({
@@ -18,7 +18,7 @@
 
     // order:
     orderList: orderListReducer,
-
+    singleOrder: singleOrderReducer, 
     // cart
     cart: cartReducer,
     cartList: cartListReducer,
