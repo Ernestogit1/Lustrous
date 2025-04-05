@@ -10,48 +10,47 @@ import styles, { COLORS } from '../style/client/CompletedOrderScreen.styles';
 
 const CompletedOrderScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-  
-  const { orders, loading } = useSelector((state) => state.orderList);
+  const { orders = [], loading } = useSelector((state) => state.orderList);
   const { userInfo } = useSelector((state) => state.userLogin);
   const [reviewMap, setReviewMap] = useState({});
 
-useFocusEffect(
-  useCallback(() => {
-    const fetchAll = async () => {
-      try {
-        // 1. Fetch completed orders
-        await dispatch(getMyOrders('Completed'));
-
-        // 2. Fetch reviews AFTER orders are in Redux
-        const state = store.getState(); // Access updated Redux state directly
-        const orders = state.orderList.orders || [];
-
-        if (orders.length === 0) return;
-
-        const updatedMap = {};
-
-        for (let order of orders) {
-          try {
-            const res = await fetchUserReview(order._id);
-            const review = res.data.review;
-            updatedMap[order._id] = review?._id || null;
-            console.log(`✅ Review for order ${order._id}:`, review?._id);
-          } catch (err) {
-            updatedMap[order._id] = null;
-            console.warn(`❌ No review for order ${order._id}:`, err.response?.data || err.message);
+  useFocusEffect(
+    useCallback(() => {
+      const fetchAll = async () => {
+        try {
+          // 1. Fetch completed orders
+          await dispatch(getMyOrders('Completed'));
+  
+          // 2. Fetch reviews AFTER orders are in Redux
+          const state = store.getState(); // Access updated Redux state directly
+          const orders = state.orderList.orders || [];
+  
+          if (orders.length === 0) return;
+  
+          const updatedMap = {};
+  
+          for (let order of orders) {
+            try {
+              const res = await fetchUserReview(order._id);
+              const review = res.data.review;
+              updatedMap[order._id] = review?._id || null;
+              console.log(`✅ Review for order ${order._id}:`, review?._id);
+            } catch (err) {
+              updatedMap[order._id] = null;
+              console.warn(`❌ No review for order ${order._id}:`, err.response?.data || err.message);
+            }
           }
+  
+          setReviewMap(updatedMap);
+        } catch (error) {
+          console.error('❌ Failed to fetch orders/reviews:', error.message);
         }
-
-        setReviewMap(updatedMap);
-      } catch (error) {
-        console.error('❌ Failed to fetch orders/reviews:', error.message);
-      }
-    };
-
-    fetchAll();
-  }, [dispatch])
-);
-
+      };
+  
+      fetchAll();
+    }, [dispatch])
+  );
+  
 
   useEffect(() => {
     if (!userInfo?.token || !orders.length) return;
@@ -81,8 +80,11 @@ useFocusEffect(
   
 
   const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
   };
 
   const renderEmptyList = () => (
@@ -92,13 +94,49 @@ useFocusEffect(
     </View>
   );
 
-  const renderItem = ({ item }) => {
-    const reviewId = reviewMap[item._id];
-    console.log('Review Map:', reviewMap);
+  const renderProductItem = (productItem, index) => {
+    if (!productItem || !productItem.product) {
+      return (
+        <View key={`missing-${index}`} style={styles.productItem}>
+          <View style={styles.missingImageContainer}>
+            <Ionicons name="image-off-outline" size={20} color={COLORS.mediumGray} />
+          </View>
+          <View style={styles.productInfo}>
+            <Text style={styles.unavailableProductText}>Product no longer available</Text>
+            <View style={styles.productDetails}>
+              <Text style={styles.productQuantity}>Qty: {productItem?.quantity || 'N/A'}</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
 
-    const hasReview = !!reviewMap[item._id]; 
-    console.log('Has Review for Order:', item._id, hasReview);
-    
+    return (
+      <View key={productItem.product._id} style={styles.productItem}>
+        {productItem.product.images?.[0] ? (
+          <Image source={{ uri: productItem.product.images[0].url }} style={styles.productImage} />
+        ) : (
+          <View style={styles.missingImageContainer}>
+            <Ionicons name="image-outline" size={20} color={COLORS.mediumGray} />
+          </View>
+        )}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{productItem.product.name}</Text>
+          <View style={styles.productDetails}>
+            <Text style={styles.productPrice}>
+              ₱{productItem.product.price ? Number(productItem.product.price).toFixed(2) : '0.00'}
+            </Text>
+            <Text style={styles.productQuantity}>Qty: {productItem.quantity}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
+  const renderItem = ({ item }) => {
+    const review = reviewMap[item._id];
+    const hasReview = !!review;
+
     return (
       <View style={styles.card}>
         <View style={styles.orderHeader}>
@@ -113,46 +151,33 @@ useFocusEffect(
         </View>
 
         <View style={styles.divider} />
-
-        {item.products.map(({ product, quantity }) => (
-          <View key={product._id} style={styles.productItem}>
-            <Image source={{ uri: product.images[0]?.url }} style={styles.productImage} />
-            <View style={styles.productInfo}>
-              <Text style={styles.productName}>{product.name}</Text>
-              <View style={styles.productDetails}>
-                <Text style={styles.productPrice}>₱{product.price.toFixed(2)}</Text>
-                <Text style={styles.productQuantity}>Qty: {quantity}</Text>
-              </View>
-            </View>
-          </View>
-        ))}
-
+        {item.products.map((p, i) => renderProductItem(p, i))}
         <View style={styles.divider} />
 
         <View style={styles.orderSummary}>
           <Text style={styles.totalItems}>{item.products.length} item(s)</Text>
-          <Text style={styles.totalAmount}>Total: ₱{item.totalAmount.toFixed(2)}</Text>
+          <Text style={styles.totalAmount}>Total: ₱{item.totalAmount?.toFixed(2)}</Text>
         </View>
 
         <View style={styles.actionButtons}>
-        <TouchableOpacity
-  style={styles.reviewButton}
-  onPress={() =>
-    hasReview
-      ? navigation.navigate('ReviewUpdate', {
-          orderId: item._id,
-          existingReview: reviewMap[item._id], // send full review
-        })
-      : navigation.navigate('WriteReview', {
-          orderId: item._id,
-        })
-  }
->
-  <Ionicons name="star-outline" size={16} color={COLORS.white} />
-  <Text style={styles.reviewButtonText}>
-    {hasReview ? 'Update Your Review' : 'Write a Review'}
-  </Text>
-</TouchableOpacity>
+          <TouchableOpacity
+            style={styles.reviewButton}
+            onPress={() =>
+              hasReview
+                ? navigation.navigate('ReviewUpdate', {
+                    orderId: item._id,
+                    existingReview: review,
+                  })
+                : navigation.navigate('WriteReview', {
+                    orderId: item._id,
+                  })
+            }
+          >
+            <Ionicons name="star-outline" size={16} color={COLORS.white} />
+            <Text style={styles.reviewButtonText}>
+              {hasReview ? 'Update Your Review' : 'Write a Review'}
+            </Text>
+          </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.reorderButton}
@@ -187,3 +212,7 @@ useFocusEffect(
 };
 
 export default CompletedOrderScreen;
+
+
+  
+  

@@ -41,6 +41,56 @@ const OrderDetailsScreen = ({ route }) => {
         return <Ionicons name="help-circle" size={20} color={COLORS.gray} />;
     }
   };
+  
+  // Helper function to render product item with null checking
+  const renderProductItem = (productItem) => {
+    // Handle null product
+    if (!productItem || !productItem.product) {
+      return (
+        <View style={styles.productItem}>
+          <View style={styles.noImageContainer}>
+            <Ionicons name="image-off-outline" size={20} color={COLORS.gray} />
+          </View>
+          <View style={styles.productInfo}>
+            <Text style={styles.unavailableText}>Product no longer available</Text>
+            <View style={styles.productDetails}>
+              <Text style={styles.productQuantity}>Qty: {productItem?.quantity || 'N/A'}</Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    const { product, quantity } = productItem;
+    const price = product.price !== undefined && product.price !== null ? 
+                  Number(product.price) : 0;
+    const total = price * quantity;
+    
+    return (
+      <View key={product._id} style={styles.productItem}>
+        {product.images && product.images[0] ? (
+          <Image 
+            source={{ uri: product.images[0].url }} 
+            style={styles.productImage}
+          />
+        ) : (
+          <View style={styles.noImageContainer}>
+            <Ionicons name="image-outline" size={20} color={COLORS.gray} />
+          </View>
+        )}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{product.name}</Text>
+          <View style={styles.productDetails}>
+            <Text style={styles.productPrice}>₱{price.toFixed(2)}</Text>
+            <Text style={styles.productQuantity}>Qty: {quantity}</Text>
+          </View>
+          <Text style={styles.itemTotal}>
+            Item Total: ₱{total.toFixed(2)}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
   if (loading) {
     return (
@@ -61,7 +111,7 @@ const OrderDetailsScreen = ({ route }) => {
             {/* Order Header */}
             <View style={styles.orderHeader}>
               <View>
-                <Text style={styles.orderId}>Order #{item._id.slice(-6)}</Text>
+                <Text style={styles.orderId}>Order #{item._id.slice(-10)}</Text>
                 <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
               </View>
               <View style={[
@@ -88,20 +138,10 @@ const OrderDetailsScreen = ({ route }) => {
               <Text style={styles.sectionTitle}>Order Items</Text>
             </View>
             
-            {item.products.map(({ product, quantity }) => (
-              <View key={product._id} style={styles.productItem}>
-                <Image source={{ uri: product.images[0]?.url }} style={styles.productImage} />
-                <View style={styles.productInfo}>
-                  <Text style={styles.productName}>{product.name}</Text>
-                  <View style={styles.productDetails}>
-                    <Text style={styles.productPrice}>₱{product.price.toFixed(2)}</Text>
-                    <Text style={styles.productQuantity}>Qty: {quantity}</Text>
-                  </View>
-                  <Text style={styles.itemTotal}>
-                    Item Total: ₱{(product.price * quantity).toFixed(2)}
-                  </Text>
-                </View>
-              </View>
+            {item.products.map((productItem, index) => (
+              <React.Fragment key={`product-${index}`}>
+                {renderProductItem(productItem)}
+              </React.Fragment>
             ))}
             
             <View style={styles.divider} />
@@ -115,7 +155,9 @@ const OrderDetailsScreen = ({ route }) => {
             <View style={styles.paymentInfo}>
               <View style={styles.paymentRow}>
                 <Text style={styles.paymentLabel}>Subtotal:</Text>
-                <Text style={styles.paymentValue}>₱{(item.totalAmount - 50).toFixed(2)}</Text>
+                <Text style={styles.paymentValue}>
+                  ₱{item.totalAmount ? (Number(item.totalAmount) - 50).toFixed(2) : '0.00'}
+                </Text>
               </View>
               <View style={styles.paymentRow}>
                 <Text style={styles.paymentLabel}>Shipping Fee:</Text>
@@ -123,7 +165,9 @@ const OrderDetailsScreen = ({ route }) => {
               </View>
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>Total:</Text>
-                <Text style={styles.totalValue}>₱{item.totalAmount.toFixed(2)}</Text>
+                <Text style={styles.totalValue}>
+                  ₱{item.totalAmount ? Number(item.totalAmount).toFixed(2) : '0.00'}
+                </Text>
               </View>
             </View>
 

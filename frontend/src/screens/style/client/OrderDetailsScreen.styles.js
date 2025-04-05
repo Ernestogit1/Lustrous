@@ -223,6 +223,23 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontFamily: 'Poppins-Medium',
   },
+  noImageContainer: {
+    width: 70,
+    height: 70,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  
+  unavailableText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+    marginBottom: 4,
+  },
 });
 
 export default styles;

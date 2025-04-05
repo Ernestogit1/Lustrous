@@ -6,13 +6,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import styles, { COLORS } from '../style/client/CancelOrderScreen.styles';
 
-const CancelOrderScreen = ({ navigation }) => {
+const CancleOrderScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { orders, loading } = useSelector((state) => state.orderList);
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(getMyOrders('Cancelled')); 
+      dispatch(getMyOrders('Cancelled')); // only fetch cancelled orders
     }, [dispatch])
   );
 
@@ -28,11 +28,58 @@ const CancelOrderScreen = ({ navigation }) => {
     </View>
   );
 
+  // Helper function to render product item with proper null checks
+  const renderProductItem = (productItem, index) => {
+    // Check if product exists
+    if (!productItem || !productItem.product) {
+      return (
+        <View key={`missing-${index}`} style={styles.productItem}>
+          <View style={styles.missingImageContainer}>
+            <Ionicons name="image-off-outline" size={20} color={COLORS.mediumGray} />
+          </View>
+          <View style={styles.productInfo}>
+            <Text style={styles.unavailableProductText}>Product no longer available</Text>
+            <View style={styles.productDetails}>
+              <Text style={styles.productQuantity}>
+                Qty: {productItem?.quantity || 'N/A'}
+              </Text>
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    // Product exists, handle potential missing images safely
+    return (
+      <View key={productItem.product._id} style={styles.productItem}>
+        {productItem.product.images && productItem.product.images[0] ? (
+          <Image 
+            source={{ uri: productItem.product.images[0].url }} 
+            style={styles.productImage}
+          />
+        ) : (
+          <View style={styles.missingImageContainer}>
+            <Ionicons name="image-outline" size={20} color={COLORS.mediumGray} />
+          </View>
+        )}
+        <View style={styles.productInfo}>
+          <Text style={styles.productName}>{productItem.product.name}</Text>
+          <View style={styles.productDetails}>
+            <Text style={styles.productPrice}>
+              ₱{productItem.product.price !== undefined ? Number(productItem.product.price).toFixed(2) : '0.00'}
+            </Text>
+            <Text style={styles.productQuantity}>Qty: {productItem.quantity}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
         <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={COLORS.error} />
+          <ActivityIndicator size="large" color={COLORS.darkPurple} />
           <Text style={styles.loaderText}>Loading cancelled orders...</Text>
         </View>
       ) : (
@@ -45,7 +92,7 @@ const CancelOrderScreen = ({ navigation }) => {
             <View style={styles.card}>
               <View style={styles.orderHeader}>
                 <View>
-                  <Text style={styles.orderId}>Order #{item._id.slice(-6)}</Text>
+                  <Text style={styles.orderId}>Order #{item._id.slice(-10)}</Text>
                   <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
                 </View>
                 <View style={styles.statusContainer}>
@@ -56,29 +103,25 @@ const CancelOrderScreen = ({ navigation }) => {
 
               <View style={styles.divider} />
               
-              {item.products.map(({ product, quantity }) => (
-                <View key={product._id} style={styles.productItem}>
-                  <Image 
-                    source={{ uri: product.images[0]?.url }} 
-                    style={styles.productImage}
-                  />
-                  <View style={styles.productInfo}>
-                    <Text style={styles.productName}>{product.name}</Text>
-                    <View style={styles.productDetails}>
-                      <Text style={styles.productPrice}>₱{product.price.toFixed(2)}</Text>
-                      <Text style={styles.productQuantity}>Qty: {quantity}</Text>
-                    </View>
-                  </View>
-                </View>
-              ))}
+              {/* Safely render products using the helper function */}
+              {item.products.map((productItem, index) => renderProductItem(productItem, index))}
               
               <View style={styles.divider} />
               
               <View style={styles.orderSummary}>
                 <Text style={styles.totalItems}>{item.products.length} item(s)</Text>
-                <Text style={styles.totalAmount}>Total: ₱{item.totalAmount.toFixed(2)}</Text>
+                <Text style={styles.totalAmount}>
+                  Total: ₱{item.totalAmount !== undefined ? Number(item.totalAmount).toFixed(2) : '0.00'}
+                </Text>
               </View>
               
+              <TouchableOpacity 
+                style={styles.detailsButton}
+                onPress={() => navigation.navigate('OrderDetail', { orderId: item._id })}
+              >
+                <Ionicons name="information-circle-outline" size={16} color={COLORS.white} />
+                <Text style={styles.detailsButtonText}>Order Details</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -87,4 +130,4 @@ const CancelOrderScreen = ({ navigation }) => {
   );
 };
 
-export default CancelOrderScreen;
+export default CancleOrderScreen;
