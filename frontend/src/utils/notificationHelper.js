@@ -56,7 +56,7 @@ export const registerPushNotifAsync = async () => {
 
 
     const tokenData = await Notifications.getExpoPushTokenAsync({
-      projectId: Constants?.expoConfig?.extra?.eas?.projectId || '173e9d5f-2440-493d-9b69-29609317041d',
+      projectId: Constants?.expoConfig?.extra?.eas?.projectId || 'bc85162b-8429-4715-975f-28a100e64e39',
     });
 
     if (!tokenData?.data) {
