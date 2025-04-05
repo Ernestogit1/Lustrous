@@ -7,8 +7,7 @@
   import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
   import { cartReducer, cartListReducer, orderListReducer, singleOrderReducer  } from '../reducers/order.Reducers';
   import { adminOrdersReducer } from '../reducers/orderAdmin.Reducers';
-  import { reviewCreateReducer } from '../reducers/review.Reducers';
-  import { notificationReducer, latestNotificationReducer } from '../reducers/notification.Reducers';
+  import { notificationReducer, latestNotificationReducer, notificationListReducer } from '../reducers/notification.Reducers';
   import { reviewCreateReducer, productReviewsReducer } from '../reducers/review.Reducers';
 
 
@@ -21,9 +20,14 @@
     productDetails: productDetailsReducer,
     userUpdate: userUpdateReducer,
     changePassword: changePasswordReducer,
+
+
+    // reviews
     reviewCreate: reviewCreateReducer,
-    latestNotification: latestNotificationReducer,
     productReviews: productReviewsReducer,
+    // notification:
+    notificationList: notificationListReducer,
+    latestNotification: latestNotificationReducer,
 
     // order:
     orderList: orderListReducer,
@@ -32,10 +36,13 @@
     cart: cartReducer,
     cartList: cartListReducer,
 
-  // admin side
+    //================================={ADMIN SIDE}=================================
+    // product:
   productCreate: productCreateReducer,
   productList: productListReducer,
+  //order
   adminOrders: adminOrdersReducer,
+  //notification
   notificationCreate: notificationReducer,
 
   });

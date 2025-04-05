@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { API_URL } from '@env';
 import {
-  NOTIF_CREATE_REQUEST, NOTIF_CREATE_SUCCESS, NOTIF_CREATE_FAIL,
-  NOTIF_FETCH_SUCCESS, NOTIF_FETCH_FAIL
+  NOTIF_CREATE_REQUEST,
+   NOTIF_CREATE_SUCCESS, 
+   NOTIF_CREATE_FAIL,
+  NOTIF_FETCH_SUCCESS, 
+  NOTIF_FETCH_FAIL,
+  NOTIF_LIST_SUCCESS,
+  NOTIF_LIST_FAIL
 } from '../constants/notification.Constants';
 import { getToken } from '../../utils/sqliteHelper';
 
@@ -55,5 +60,18 @@ export const fetchLatestNotification = () => async (dispatch) => {
   } catch (err) {
     console.error('❌ Fetch error:', err.response?.data || err.message); // ⛔ optional
     dispatch({ type: NOTIF_FETCH_FAIL, payload: err.response?.data?.message || err.message });
+  }
+};
+
+
+export const fetchAllNotifications = () => async (dispatch) => {
+  try {
+    const token = await getToken();
+    const { data } = await axios.get(`${API_URL}/api/notifications/all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    dispatch({ type: NOTIF_LIST_SUCCESS, payload: data.notifications });
+  } catch (err) {
+    dispatch({ type: NOTIF_LIST_FAIL, payload: err.response?.data?.message || err.message });
   }
 };

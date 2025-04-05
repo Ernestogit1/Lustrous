@@ -54,12 +54,12 @@ const UserDrawerNavigator = () => {
         {/* Notification Icon */}
         <TouchableOpacity 
           style={styles.headerIcon}
-          onPress={() => setDropdownVisible(true)}
+          onPress={() => navigation.navigate('Notification')}
         >
           <Ionicons name="notifications-outline" size={24} color={COLORS.darkPurple} />
           <NotificationBadge count={0} />
         </TouchableOpacity>
-        
+                
         {/* Cart Icon */}
         <TouchableOpacity 
           style={styles.headerIcon}

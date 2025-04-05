@@ -38,6 +38,7 @@ import SingleOrderDetailScreen from './src/screens/client/SingleOrderDetailScree
 import writeReviewScreen from './src/screens/client/ReviewCreateScreen';
 import updateReviewScreen from './src/screens/client/ReviewUpdateScreen';
 import singleNotificationScreen from './src/screens/client/SingleNotificationScreen';
+import displayNotificationScreen from './src/screens/client/NotificationDisplayScreen';
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -151,7 +152,15 @@ function UserNavigator() {
         component={singleNotificationScreen}
         options={{
           headerShown: true,
-          headerTitle: "Notification"
+          headerTitle: ""
+        }}
+      />
+         <UserStack.Screen
+        name="Notification"
+        component={displayNotificationScreen}
+        options={{
+          headerShown: true,
+          headerTitle: ""
         }}
       />
     </UserStack.Navigator>
