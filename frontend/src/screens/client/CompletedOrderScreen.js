@@ -178,14 +178,6 @@ const CompletedOrderScreen = ({ navigation }) => {
               {hasReview ? 'Update Your Review' : 'Write a Review'}
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.reorderButton}
-            onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}
-          >
-            <Ionicons name="information-circle-outline" size={16} color={COLORS.darkPurple} />
-            <Text style={styles.reorderButtonText}>Order Details</Text>
-          </TouchableOpacity>
         </View>
       </View>
     );
@@ -204,56 +196,7 @@ const CompletedOrderScreen = ({ navigation }) => {
           keyExtractor={(order) => order._id}
           ListEmptyComponent={renderEmptyList}
           contentContainerStyle={orders.length === 0 ? { flex: 1 } : { paddingBottom: 20 }}
-<<<<<<< HEAD
-          renderItem={({ item }) => (
-            <View style={styles.card}>
-              <View style={styles.orderHeader}>
-                <View>
-                  <Text style={styles.orderId}>Order #{item._id.slice(-10)}</Text>
-                  <Text style={styles.orderDate}>{formatDate(item.createdAt)}</Text>
-                </View>
-                <View style={styles.statusContainer}>
-                  <Ionicons name="checkmark-circle" size={16} color={COLORS.success} />
-                  <Text style={styles.statusText}>{item.status}</Text>
-                </View>
-              </View>
-
-              <View style={styles.divider} />
-              
-              {/* Safely render products using the helper function */}
-              {item.products.map((productItem, index) => renderProductItem(productItem, index))}
-              
-              <View style={styles.divider} />
-              
-              <View style={styles.orderSummary}>
-                <Text style={styles.totalItems}>{item.products.length} item(s)</Text>
-                <Text style={styles.totalAmount}>
-                  Total: ₱{item.totalAmount !== undefined ? Number(item.totalAmount).toFixed(2) : '0.00'}
-                </Text>
-              </View>
-              
-              <View style={styles.actionButtons}>
-                <TouchableOpacity 
-                  style={styles.reviewButton}
-                  onPress={() => navigation.navigate('WriteReview', { orderId: item._id })}
-                >
-                  <Ionicons name="star-outline" size={16} color={COLORS.white} />
-                  <Text style={styles.reviewButtonText}>Write a Review</Text>
-                </TouchableOpacity>
-                
-                {/* <TouchableOpacity 
-                  style={styles.reorderButton}
-                  onPress={() => navigation.navigate('OrderDetail', { orderId: item._id })}
-                >
-                  <Ionicons name="information-circle-outline" size={16} color={COLORS.darkPurple} />
-                  <Text style={styles.reorderButtonText}>Order Details</Text>
-                </TouchableOpacity> */}
-              </View>
-            </View>
-          )}
-=======
           renderItem={renderItem}
->>>>>>> bff010dfac33de9ce96282c620726e5aa45f386d
         />
       )}
     </View>
