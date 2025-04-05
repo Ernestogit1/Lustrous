@@ -175,7 +175,7 @@ const removeFromCart = async (req, res) => {
         title: `🛒 Order Placed`,
         body: `${user.name} ordered ${totalQty} item(s): ${productNames}. Total ₱${totalAmount}`,
         data: {
-          screen: "OrderDetail",
+          screen: "OrderDetail", 
           orderId: order._id.toString()
         }
       });
@@ -220,7 +220,7 @@ const removeFromCart = async (req, res) => {
       let statusFilter;
   
       if (!statusParam) {
-        statusFilter = ['Order Placed', 'Shipped']; // default
+        statusFilter = ['Order Placed', 'Shipped']; 
       } else if (Array.isArray(statusParam)) {
         statusFilter = statusParam;
       } else {
@@ -266,8 +266,96 @@ const removeFromCart = async (req, res) => {
     }
   };
   
+  const getSingleUserOrder = async (req, res) => {
+    try {
+      const userId = req.user?._id || req.user?.userId;
+      const { id } = req.params;
+  
+      const order = await Order.findOne({
+        _id: id,
+        user: userId,
+      }).populate('products.product', 'name images price');
+  
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found' });
+      }
+  
+      res.status(200).json({ order });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch order', error: err.message });
+    }
+  };
+
+  // ======================={ADMIN SIDE}========================
+  const updateOrderStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+  
+      const order = await Order.findById(id).populate('user', 'name pushToken');
+      if (!order) return res.status(404).json({ message: 'Order not found' });
+  
+      order.status = status;
+      await order.save();
+  
+      await sendPushNotification(order.user._id, {
+        title: '📦 Order Status Updated',
+        body: `Your order ${order._id} is now "${status}"`,
+        data: { screen: 'OrderDetail', orderId: order._id.toString() }
+      });
+  
+      res.status(200).json({ message: 'Order status updated', order });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to update order status', error: err.message });
+    }
+  };
+  const getAllOrdersForAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({
+        status: { $nin: ['Completed', 'Cancelled'] },
+      })
+        .populate('user', 'name pushToken')
+        .populate('products.product', 'name images');
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch admin orders', error: err.message });
+    }
+  };
+
+  const getCancelledOrdersAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({
+        status: 'Cancelled'
+      })
+        .sort({ createdAt: -1 })
+        .populate('user', 'name email') // ✅ show user info
+        .populate({ path: 'products.product', select: 'name images price' });
+  
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch cancelled orders', error: err.message });
+    }
+  };
+
+  const getCompletedOrdersAdmin = async (req, res) => {
+    try {
+      const orders = await Order.find({ status: 'Completed' })
+        .sort({ createdAt: -1 })
+        .populate('user', 'name email')
+        .populate({ path: 'products.product', select: 'name images price' });
   
 
+  
+      res.status(200).json({ orders });
+    } catch (err) {
+      res.status(500).json({ message: 'Failed to fetch completed orders', error: err.message });
+    }
+  };
+  
+  
+  
 module.exports = { 
   addToCart, 
   getCartItems, 
@@ -276,5 +364,10 @@ module.exports = {
   checkoutOrder, 
   updatePushToken, 
   getUserOrders,
-  cancelOrder
+  cancelOrder,
+  getSingleUserOrder,
+  updateOrderStatus,
+  getAllOrdersForAdmin,
+  getCancelledOrdersAdmin,
+  getCompletedOrdersAdmin
 };

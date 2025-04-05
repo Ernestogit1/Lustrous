@@ -34,7 +34,7 @@ import CheckoutScreen from './src/screens/client/CheckoutScreen';
 import EditProfileScreen from './src/screens/client/EditProfileScreen';
 import ProfileScreen from './src/screens/client/ProfileScreen';
 import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
-
+import SingleOrderDetailScreen from './src/screens/client/SingleOrderDetailScreen';
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -116,6 +116,14 @@ function UserNavigator() {
         options={{
           headerShown: true,
           headerTitle: "",
+        }}
+      />
+      <UserStack.Screen
+        name="OrderDetail"
+        component={SingleOrderDetailScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Order Detail"
         }}
       />
     </UserStack.Navigator>
