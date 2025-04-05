@@ -36,6 +36,7 @@ import ProfileScreen from './src/screens/client/ProfileScreen';
 import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
 import SingleOrderDetailScreen from './src/screens/client/SingleOrderDetailScreen';
 import writeReviewScreen from './src/screens/client/ReviewCreateScreen';
+import updateReviewScreen from './src/screens/client/ReviewUpdateScreen';
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -133,6 +134,14 @@ function UserNavigator() {
         options={{
           headerShown: true,
           headerTitle: "Write a Review"
+        }}
+      />
+          <UserStack.Screen
+        name="ReviewUpdate"
+        component={updateReviewScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Update your Review"
         }}
       />
     </UserStack.Navigator>

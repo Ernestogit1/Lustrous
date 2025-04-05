@@ -53,4 +53,27 @@ const createReview = async (req, res) => {
       res.status(500).json({ message: 'Error fetching review', error: error.message });
     }
   };
-module.exports = { createReview, getUserReviewByOrder };
+
+  const updateReview = async (req, res) => {
+    try {
+      const userId = req.user.userId || req.user._id;
+      const { orderId } = req.params;
+      const { rating, comment } = req.body;
+  
+      const review = await Review.findOne({ userId, orderId });
+      if (!review) {
+        return res.status(404).json({ message: 'Review not found' });
+      }
+  
+      review.rating = rating;
+      review.comment = comment;
+      await review.save();
+  
+      return res.status(200).json({ message: 'Review updated', review });
+    } catch (error) {
+      console.error('[UPDATE REVIEW ERROR]', error.message);
+      return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+  
+module.exports = { createReview, getUserReviewByOrder, updateReview };

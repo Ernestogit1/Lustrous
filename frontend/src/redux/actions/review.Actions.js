@@ -56,4 +56,24 @@ export const createReview = (orderId, rating, comment) => async (dispatch) => {
         });
     });
   };
+  export const updateReview = (orderId, rating, comment) => async (dispatch) => {
+    try {
+      const token = await getToken();
+  
+      const { data } = await axios.put(
+        `${API_URL}/api/reviews/${orderId}`,
+        { rating, comment },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+  
+      return data; // you can dispatch if you want to set updateReview state
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+  };
   

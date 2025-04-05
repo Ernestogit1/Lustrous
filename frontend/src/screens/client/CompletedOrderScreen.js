@@ -136,14 +136,24 @@ useFocusEffect(
 
         <View style={styles.actionButtons}>
         <TouchableOpacity
-            style={styles.reviewButton}
-            onPress={() => navigation.navigate('WriteReview', { orderId: item._id, reviewId })} // pass reviewId
-            >
-            <Ionicons name="star-outline" size={16} color={COLORS.white} />
-            <Text style={styles.reviewButtonText}>
-                {hasReview ? 'Update Your Review' : 'Write a Review'}
-            </Text>
-            </TouchableOpacity>
+  style={styles.reviewButton}
+  onPress={() =>
+    hasReview
+      ? navigation.navigate('ReviewUpdate', {
+          orderId: item._id,
+          existingReview: reviewMap[item._id], // send full review
+        })
+      : navigation.navigate('WriteReview', {
+          orderId: item._id,
+        })
+  }
+>
+  <Ionicons name="star-outline" size={16} color={COLORS.white} />
+  <Text style={styles.reviewButtonText}>
+    {hasReview ? 'Update Your Review' : 'Write a Review'}
+  </Text>
+</TouchableOpacity>
+
           <TouchableOpacity
             style={styles.reorderButton}
             onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}
