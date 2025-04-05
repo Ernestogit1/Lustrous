@@ -123,7 +123,7 @@ function UserNavigator() {
         component={SingleOrderDetailScreen}
         options={{
           headerShown: true,
-          headerTitle: "Order Detail"
+          headerTitle: ""
         }}
       />
     </UserStack.Navigator>

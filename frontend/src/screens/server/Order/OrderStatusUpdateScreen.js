@@ -1,45 +1,115 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import { View, Text, FlatList, Image } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAdminOrders, updateOrderStatus } from '../../../redux/actions/orderAdmin.Action';
 import { Button, ActivityIndicator, Menu } from 'react-native-paper';
 import { useIsFocused } from '@react-navigation/native';
+import { Ionicons } from '@expo/vector-icons';
+import styles, { COLORS } from '../../style/server/OrderStatusUpdateScreen.styles';
 
 const OrderStatusUpdateScreen = () => {
-    const state = useSelector(state => state);
-    // console.log('[🧾 Full Redux State]', state);
-
-
   const dispatch = useDispatch();
-  const isFocused = useIsFocused(); // ✅ track when screen is in focus
+  const isFocused = useIsFocused();
 
-  const { orders, loading } = state.adminOrders || {};
-//   console.log('[🧾 Orders from Redux]', orders);
-  
+  const { orders, loading } = useSelector(state => state.adminOrders || {});
   const [menuVisible, setMenuVisible] = useState(null);
 
   useEffect(() => {
     if (isFocused) {
-      dispatch(getAdminOrders()); // ✅ refresh orders on focus
+      dispatch(getAdminOrders());
     }
   }, [dispatch, isFocused]);
 
-//   useEffect(() => {
-//     console.log('[🧾 Orders from Redux]', orders);
-//   }, [orders]);
-
   const STATUS_OPTIONS = ['Order Placed', 'Shipped', 'Completed', 'Cancelled'];
+  
+  const getStatusColor = (status) => {
+    switch(status) {
+      case 'Completed': return COLORS.success;
+      case 'Shipped': return COLORS.info;
+      case 'Cancelled': return COLORS.error;
+      default: return COLORS.pending; // 'Order Placed'
+    }
+  };
+
+  const renderProductItem = (product, index) => {
+
+    if (!product || !product.product) {
+      return (
+        <View key={index} style={styles.row}>
+          <View style={styles.noImageContainer}>
+            <Ionicons name="image-off-outline" size={20} color={COLORS.grayMedium} />
+          </View>
+          <Text style={styles.deletedProductText}>Product no longer available x {product?.quantity || 'N/A'}</Text>
+        </View>
+      );
+    }
+
+    // Handle case where products are permanently deleted
+    return (
+      <View key={index} style={styles.row}>
+        {product.product.images && product.product.images.length > 0 ? (
+          <Image 
+            source={{ uri: product.product.images[0].url }} 
+            style={styles.image} 
+          />
+        ) : (
+          <View style={styles.noImageContainer}>
+            <Ionicons name="image-outline" size={20} color={COLORS.grayMedium} />
+          </View>
+        )}
+        <View style={styles.productInfoContainer}>
+          <Text style={styles.productName}>{product.product.name}</Text>
+          <Text style={styles.productQuantity}>Quantity: {product.quantity}</Text>
+          <Text style={styles.productPrice}>
+            ₱{product.product.price !== undefined && product.product.price !== null 
+              ? Number(product.product.price).toFixed(2) 
+              : '0.00'}
+          </Text>
+        </View>
+      </View>
+    );
+  };
 
   const renderOrder = ({ item }) => (
     <View style={styles.card}>
-      <Text style={styles.user}>👤 {item.user.name}</Text>
-      <Text>🧾 Total: ₱{item.totalAmount}</Text>
-      {item.products.map((p, i) => (
-        <View key={i} style={styles.row}>
-          <Image source={{ uri: p.product.images[0]?.url }} style={styles.image} />
-          <Text>{p.product.name} x {p.quantity}</Text>
+      <View style={styles.orderIdContainer}>
+        <Text style={styles.orderIdLabel}>Order ID:</Text>
+        <Text style={styles.orderId}>{item._id.slice(-10)}</Text>
+      </View>
+      
+      <View style={styles.cardHeader}>
+        <View style={styles.userContainer}>
+          <Ionicons name="person-circle-outline" size={20} color={COLORS.primary} />
+          <Text style={styles.userName}>{item.user.name}</Text>
         </View>
-      ))}
+        <Text style={styles.orderDate}>
+          {new Date(item.createdAt).toLocaleDateString()}
+        </Text>
+      </View>
+      
+      <View style={styles.orderInfo}>
+        <View style={styles.infoRow}>
+          <Ionicons name="receipt-outline" size={16} color={COLORS.grayDark} />
+          <Text style={styles.orderTotal}>
+            Total: ₱{item.totalAmount !== undefined ? Number(item.totalAmount).toFixed(2) : '0.00'}
+          </Text>
+        </View>
+        
+        {item.shippingAddress?.address && (
+          <View style={styles.infoRow}>
+            <Ionicons name="location-outline" size={16} color={COLORS.grayDark} />
+            <Text style={styles.orderAddress}>
+              {item.shippingAddress.address}
+            </Text>
+          </View>
+        )}
+      </View>
+      
+      <View style={styles.divider} />
+      
+      <Text style={styles.productListHeader}>Products:</Text>
+      {item.products && item.products.map((p, i) => renderProductItem(p, i))}
+      
       <Menu
         visible={menuVisible === item._id}
         onDismiss={() => setMenuVisible(null)}
@@ -47,7 +117,8 @@ const OrderStatusUpdateScreen = () => {
           <Button
             mode="outlined"
             onPress={() => setMenuVisible(item._id)}
-            style={styles.statusBtn}
+            style={[styles.statusBtn, { borderColor: getStatusColor(item.status) }]}
+            labelStyle={[styles.statusBtnLabel, { color: getStatusColor(item.status) }]}
           >
             Status: {item.status}
           </Button>
@@ -60,30 +131,46 @@ const OrderStatusUpdateScreen = () => {
               setMenuVisible(null);
             }}
             title={status}
+            titleStyle={styles.menuItemTitle}
           />
         ))}
       </Menu>
     </View>
   );
 
-  if (loading) return <ActivityIndicator style={{ marginTop: 50 }} />;
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>Loading orders...</Text>
+      </View>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <View style={styles.emptyContainer}>
+        <Ionicons name="receipt-outline" size={60} color={COLORS.grayMedium} />
+        <Text style={styles.emptyText}>No orders found</Text>
+      </View>
+    );
+  }
 
   return (
-    <FlatList
-      data={orders}
-      keyExtractor={(item) => item._id}
-      renderItem={renderOrder}
-      contentContainerStyle={{ padding: 16 }}
-    />
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Order Management</Text>
+        <Text style={styles.headerSubtitle}>Update order status and track deliveries</Text>
+      </View>
+      
+      <FlatList
+        data={orders}
+        keyExtractor={(item) => item._id}
+        renderItem={renderOrder}
+        contentContainerStyle={styles.listContainer}
+      />
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  card: { backgroundColor: '#f8f8f8', marginBottom: 12, padding: 12, borderRadius: 8 },
-  user: { fontWeight: 'bold', marginBottom: 6 },
-  row: { flexDirection: 'row', alignItems: 'center', marginVertical: 6 },
-  image: { width: 40, height: 40, marginRight: 10, borderRadius: 4 },
-  statusBtn: { marginTop: 10 },
-});
 
 export default OrderStatusUpdateScreen;

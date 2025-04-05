@@ -186,6 +186,22 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontFamily: 'Poppins-Medium',
   },
+  missingImageContainer: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  
+  unavailableProductText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+  },
 });
 
 export default styles;
