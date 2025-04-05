@@ -11,6 +11,7 @@ import ProductTrash from '../screens/server/Product/Product.Trash';
 import orderUpdate from '../screens/server/Order/OrderStatusUpdateScreen';
 import orderCancle from '../screens/server/Order/OrderCancleScreen';
 import orderDelivered from '../screens/server/Order/OrderCompletedScreen';
+import NotificationCreate from '../screens/server/Notification/Notification.Create';
 import styles, { COLORS } from '../screens/style/server/AdminSidebar.styles';
 
 const Drawer = createDrawerNavigator();
@@ -165,6 +166,14 @@ export default function AdminSideBar() {
         component={orderDelivered}
         options={{
           title: "Completed Orders",
+          headerTitle: "",
+        }}
+      />
+        <Drawer.Screen 
+        name="Notification" 
+        component={NotificationCreate}
+        options={{
+          title: "Create Discount/Promotion",
           headerTitle: "",
         }}
       />

@@ -37,6 +37,7 @@ import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
 import SingleOrderDetailScreen from './src/screens/client/SingleOrderDetailScreen';
 import writeReviewScreen from './src/screens/client/ReviewCreateScreen';
 import updateReviewScreen from './src/screens/client/ReviewUpdateScreen';
+import singleNotificationScreen from './src/screens/client/SingleNotificationScreen';
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -142,6 +143,15 @@ function UserNavigator() {
         options={{
           headerShown: true,
           headerTitle: "Update your Review"
+        }}
+      />
+      
+      <UserStack.Screen
+        name="SingleNotification"
+        component={singleNotificationScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Notification"
         }}
       />
     </UserStack.Navigator>

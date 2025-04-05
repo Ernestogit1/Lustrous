@@ -8,6 +8,7 @@
   import { cartReducer, cartListReducer, orderListReducer, singleOrderReducer  } from '../reducers/order.Reducers';
   import { adminOrdersReducer } from '../reducers/orderAdmin.Reducers';
   import { reviewCreateReducer } from '../reducers/review.Reducers';
+  import { notificationReducer, latestNotificationReducer } from '../reducers/notification.Reducers';
 
 
 
@@ -19,6 +20,7 @@
     userUpdate: userUpdateReducer,
     changePassword: changePasswordReducer,
     reviewCreate: reviewCreateReducer,
+    latestNotification: latestNotificationReducer,
 
     // order:
     orderList: orderListReducer,
@@ -31,7 +33,7 @@
   productCreate: productCreateReducer,
   productList: productListReducer,
   adminOrders: adminOrdersReducer,
-
+  notificationCreate: notificationReducer,
 
   });
 

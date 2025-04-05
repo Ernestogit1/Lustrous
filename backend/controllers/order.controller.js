@@ -329,7 +329,7 @@ const removeFromCart = async (req, res) => {
         status: 'Cancelled'
       })
         .sort({ createdAt: -1 })
-        .populate('user', 'name email') // ✅ show user info
+        .populate('user', 'name email') 
         .populate({ path: 'products.product', select: 'name images price' });
   
   
