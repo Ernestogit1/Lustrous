@@ -9,7 +9,7 @@ const ProductDetailsScreen = ({ route }) => {
   const { product } = route.params;
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const dispatch = useDispatch();
-const userInfo = useSelector((state) => state.userLogin?.userInfo);
+  const userInfo = useSelector((state) => state.userLogin?.userInfo);
 
   const handleImagePress = (index) => {
     setCurrentImageIndex(index);
@@ -22,7 +22,7 @@ const userInfo = useSelector((state) => state.userLogin?.userInfo);
   };
 
   const handleAddToCart = () => {
-    if (userInfo?._id) {
+    if (userInfo?._id && product.stock > 0) {
       dispatch(addToCart(product._id));
     }
   };
@@ -65,7 +65,10 @@ const userInfo = useSelector((state) => state.userLogin?.userInfo);
         <Text style={styles.productName}>{product.name}</Text>
         <View style={styles.priceStockContainer}>
           <Text style={styles.productPrice}>₱{product.price}</Text>
-          <Text style={styles.productStock}>
+          <Text style={[
+            styles.productStock,
+            product.stock === 0 && styles.outOfStockText
+          ]}>
             {product.stock > 0
               ? `Stock: ${product.stock}`
               : "Out of stock"}
@@ -82,7 +85,11 @@ const userInfo = useSelector((state) => state.userLogin?.userInfo);
           onPress={handleAddToCart}
           disabled={product.stock === 0}
         >
-          <Ionicons name="cart-outline" size={18} color="white" />
+          <Ionicons 
+            name="cart-outline" 
+            size={18} 
+            color="white" 
+          />
           <Text style={styles.addToCartText}>Add to Cart</Text>
         </TouchableOpacity>
       </View>

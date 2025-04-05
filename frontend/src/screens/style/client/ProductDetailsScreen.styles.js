@@ -93,12 +93,22 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: "70%",
     alignSelf: "center",
+    marginTop: 20,
   },
   addToCartText: {
     fontSize: 16,
     fontFamily: "Poppins-Medium",
     color: COLORS.white,
     marginLeft: 8,
+  },
+  disabledButton: {
+    backgroundColor: '#AAAAAA', 
+    opacity: 0.8,
+  },
+  
+  outOfStockText: {
+    color: '#E53935', 
+    fontFamily: 'Poppins-Medium',
   },
 });
 

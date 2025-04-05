@@ -178,6 +178,69 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Poppins-Medium',
   },
-});
+
+  missingImageContainer: {
+    width: 80,
+    height: 80,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+
+  unavailableText: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+  },
+
+  subtotalItemDetails: {
+    flex: 1,
+    flexDirection: 'column',
+    marginRight: 8,
+  },
+
+  subtotalItemQuantity: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 12,
+    color: '#777',
+    marginTop: 2,
+  },
+
+  subtotalItemPrice: {
+    fontFamily: 'Poppins-Medium',
+    fontSize: 14,
+    color: '#333',
+  },
+
+  warningContainer: {
+    backgroundColor: '#FFF3CD',
+    borderColor: '#FFE58F',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 12,
+    marginVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  warningText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 13,
+    color: '#856404',
+    marginLeft: 8,
+    flex: 1,
+  },
+
+  disabledCheckoutButton: {
+    backgroundColor: '#cccccc',
+  },
+
+  disabledCheckoutText: {
+    color: '#666666',
+  },
+  });
 
 export default styles;
