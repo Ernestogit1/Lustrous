@@ -211,22 +211,22 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     fontFamily: 'Poppins-Medium',
   },
-missingImageContainer: {
-  width: 60,
-  height: 60,
-  backgroundColor: '#F0F0F0',
-  borderRadius: 8,
-  justifyContent: 'center',
-  alignItems: 'center',
-  marginRight: 12,
-},
+  missingImageContainer: {
+    width: 60,
+    height: 60,
+    backgroundColor: '#F0F0F0',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
 
-unavailableProductText: {
-  fontFamily: 'Poppins-Regular',
-  fontSize: 14,
-  color: '#888',
-  fontStyle: 'italic',
-},
+  unavailableProductText: {
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: '#888',
+    fontStyle: 'italic',
+  },
 });
 
 export default styles;

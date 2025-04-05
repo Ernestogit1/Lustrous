@@ -37,14 +37,19 @@ export const loadUser = () => async (dispatch) => {
     if (token) {
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const { data } = await axios.get(`${API_URL}/api/auth/me`, config);
+
       dispatch({ type: USER_LOGIN_SUCCESS, payload: data.user });
+
+      
+      dispatch(updatePushToken());
     } else {
       dispatch({ type: USER_LOGOUT });
     }
   } catch (error) {
     dispatch({ type: USER_LOGOUT });
   }
-}
+};
+
 
 export const registerUser = (formData) => async (dispatch) => {
   try {
@@ -109,6 +114,21 @@ export const googleLogin = () => async (dispatch) => {
   }
 };
 
+
+export const updatePushToken = () => async () => {
+  try {
+    const token = await getToken();
+    const pushToken = await registerPushNotifAsync();
+
+    await axios.put(`${API_URL}/api/auth/update-push-token`, { pushToken }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    console.log('✅ Push token updated on backend');
+  } catch (err) {
+    console.warn('❌ Failed to update push token:', err.message);
+  }
+};
 
 export const logoutUser = () => async (dispatch) => {
   await removeToken();

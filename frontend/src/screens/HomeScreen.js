@@ -146,12 +146,6 @@ const HomeScreen = () => {
             />
           </View>
           <View style={styles.headerRight}>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="search-outline" size={22} color={COLORS.darkPurple} />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.iconButton}>
-              <Ionicons name="heart-outline" size={22} color={COLORS.darkPurple} />
-            </TouchableOpacity>
             <TouchableOpacity 
               style={styles.iconButton}
               onPress={() => navigation.navigate('Register')}
@@ -303,37 +297,7 @@ const HomeScreen = () => {
           </View>
         </View>
 
-        {/* Collections Section */}
-        <View style={styles.sectionContainer}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Collections</Text>
-            <TouchableOpacity>
-              <Text style={styles.seeAllText}>See All</Text>
-            </TouchableOpacity>
-          </View>
-          
-          <View style={styles.newArrivalsGrid}>
-            {[1, 2].map((item) => (
-              <TouchableOpacity key={item} style={styles.newArrivalCard}>
-                <View style={styles.newArrivalImage}>
-                  <LinearGradient
-                    colors={[COLORS.mediumPink, COLORS.lightPurple]}
-                    style={styles.newArrivalGradient}
-                  >
-                    <Text style={styles.placeholderText}>Collection</Text>
-                  </LinearGradient>
-                </View>
-                <View style={styles.newArrivalContent}>
-                  <Text style={styles.newArrivalTitle}>Spring Collection</Text>
-                  <Text style={styles.newArrivalSubtitle}>Fresh looks for the season</Text>
-                  <TouchableOpacity style={styles.outlineButton}>
-                    <Text style={styles.outlineButtonText}>Explore</Text>
-                  </TouchableOpacity>
-                </View>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+   
 
         {/* Call-to-Action Section */}
         <View style={styles.ctaSection}>

@@ -197,6 +197,33 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
   },
+  outOfStockOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 8,
+  },
+  outOfStockText: {
+    color: '#FFFFFF',
+    fontFamily: 'Poppins-SemiBold',
+    fontSize: 14,
+    textTransform: 'uppercase',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  
+  disabledAddToCartButton: {
+    backgroundColor: '#AAAAAA',
+    opacity: 0.8,
+  },
 });
 
 export default styles;

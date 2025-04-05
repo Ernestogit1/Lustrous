@@ -5,7 +5,6 @@ const {
     removeFromCart, 
     updateCartQuantity, 
     checkoutOrder,
-     updatePushToken, 
      getUserOrders,
      cancelOrder,
      getSingleUserOrder,
@@ -21,8 +20,7 @@ const router = express.Router();
 router.get('/my-orders', isAuthenticated, getUserOrders);
 
 
-// push token
-router.put('/update-push-token', isAuthenticated, updatePushToken);
+
 // checkout
 router.post('/checkout', isAuthenticated, checkoutOrder);
 //  cart

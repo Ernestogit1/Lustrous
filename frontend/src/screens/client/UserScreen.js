@@ -153,17 +153,30 @@ const UserScreen = ({ navigation }) => {
               >
                 <View style={styles.gridProductImageContainer}>
                   {product.images && product.images.length > 0 ? (
-                    <Image 
-                      source={{ uri: product.images[0].url || product.images[0] }} 
-                      style={styles.gridProductImage}
-                      resizeMode="cover"
-                    />
+                    <>
+                      <Image 
+                        source={{ uri: product.images[0].url || product.images[0] }} 
+                        style={styles.gridProductImage}
+                        resizeMode="cover"
+                      />
+                      {/* Out of Stock Overlay */}
+                      {product.stock <= 0 && (
+                        <View style={styles.outOfStockOverlay}>
+                          <Text style={styles.outOfStockText}>Out of Stock</Text>
+                        </View>
+                      )}
+                    </>
                   ) : (
                     <LinearGradient
                       colors={[COLORS.lightPink, COLORS.mediumPink]}
                       style={styles.gridProductImagePlaceholder}
                     >
                       <Text style={styles.placeholderText}>Product</Text>
+                      {product.stock <= 0 && (
+                        <View style={styles.outOfStockOverlay}>
+                          <Text style={styles.outOfStockText}>Out of Stock</Text>
+                        </View>
+                      )}
                     </LinearGradient>
                   )}
                 </View>
@@ -171,18 +184,30 @@ const UserScreen = ({ navigation }) => {
                   <Text style={styles.gridProductName} numberOfLines={1}>{product.name}</Text>
                   <Text style={styles.gridProductPrice}>₱{product.price}</Text>
                   
-                  {/* Add to Cart Button */}
-                  <TouchableOpacity
-                    style={styles.addToCartButton}
-                    onPress={() => {
-                      if (userInfo?._id) {
-                        dispatch(addToCart(product._id));
-                      }
-                    }}
-                  >
-                    <Ionicons name="cart-outline" size={16} color="white" />
-                    <Text style={styles.addToCartText}>Add to Cart</Text>
-                  </TouchableOpacity>
+              <TouchableOpacity
+                style={[
+                  styles.addToCartButton,
+                  product.stock <= 0 && styles.disabledAddToCartButton
+                ]}
+                onPress={() => {
+                  if (userInfo?._id && product.stock > 0) {
+                    dispatch(addToCart(product._id));
+                  }
+                }}
+                disabled={product.stock <= 0}
+              >
+                <Ionicons 
+                  name="cart-outline"  
+                  size={16} 
+                  color="white" 
+                />
+                <Text style={[
+                  styles.addToCartText,
+                  product.stock <= 0 && styles.disabledAddToCartText
+                ]}>
+                  {product.stock > 0 ? "Add to Cart" : "Add to Cart"}
+                </Text>
+              </TouchableOpacity>
                 </View>
               </TouchableOpacity>
             ))}

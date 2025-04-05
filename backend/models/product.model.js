@@ -31,10 +31,7 @@ const ProductSchema = new mongoose.Schema({
       url: String,
     },
   ],
-  rate: {
-    type: Number,
-    default: 0,
-  },
+
   deleted: {
     type: Boolean,
     default: false,

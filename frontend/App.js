@@ -134,7 +134,7 @@ function UserNavigator() {
         component={writeReviewScreen}
         options={{
           headerShown: true,
-          headerTitle: "Write a Review"
+          headerTitle: ""
         }}
       />
           <UserStack.Screen
@@ -142,7 +142,7 @@ function UserNavigator() {
         component={updateReviewScreen}
         options={{
           headerShown: true,
-          headerTitle: "Update your Review"
+          headerTitle: ""
         }}
       />
       

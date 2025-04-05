@@ -278,5 +278,22 @@ const changePassword = async (req, res) => {
 };
 
 
+  const updatePushToken = async (req, res) => {
+    const userId = req.user.userId || req.user._id;
+    const { pushToken } = req.body;
+  
+    if (!pushToken) return res.status(400).json({ message: 'No push token provided' });
+  
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+  
+    user.pushToken = pushToken;
+    await user.save();
+  
+    res.status(200).json({ message: 'Expo push token updated successfully' });
+  };
 
-module.exports = { registerUser, loginUser, getUserProfile, googleLoginUser, updateUserProfile, changePassword  };
+
+  
+
+module.exports = { registerUser, loginUser, getUserProfile, googleLoginUser, updateUserProfile, changePassword, updatePushToken  };

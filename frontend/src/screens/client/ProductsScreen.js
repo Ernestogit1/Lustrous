@@ -70,14 +70,28 @@ const ProductsScreen = ({ navigation }) => {
     >
       <View style={styles.gridProductImageContainer}>
         {item.images && item.images.length > 0 ? (
-          <Image
-            source={{ uri: item.images[0]?.url || item.images[0] }}
-            style={styles.gridProductImage}
-            resizeMode="cover"
-          />
+          <>
+            <Image
+              source={{ uri: item.images[0]?.url || item.images[0] }}
+              style={styles.gridProductImage}
+              resizeMode="cover"
+            />
+            {/* Out of stock overlay */}
+            {item.stock <= 0 && (
+              <View style={styles.outOfStockOverlay}>
+                <Text style={styles.outOfStockText}>Out of Stock</Text>
+              </View>
+            )}
+          </>
         ) : (
           <View style={styles.gridProductImagePlaceholder}>
             <Text style={styles.placeholderText}>No Image</Text>
+            {/* Out of stock overlay on placeholder */}
+            {item.stock <= 0 && (
+              <View style={styles.outOfStockOverlay}>
+                <Text style={styles.outOfStockText}>Out of Stock</Text>
+              </View>
+            )}
           </View>
         )}
       </View>
@@ -87,16 +101,19 @@ const ProductsScreen = ({ navigation }) => {
         </Text>
         <Text style={styles.gridProductPrice}>₱{item.price}</Text>
 
-        {/* Add to Cart Button */}
         <TouchableOpacity
-          style={styles.addToCartButton}
+          style={[
+            styles.addToCartButton,
+            item.stock <= 0 && styles.disabledAddToCartButton
+          ]}
           onPress={() => {
-            if (userInfo?._id) {
+            if (userInfo?._id && item.stock > 0) {
               dispatch(addToCart(item._id));
-            } else {
+            } else if (!userInfo?._id) {
               navigation.navigate('Login'); 
             }
           }}
+          disabled={item.stock <= 0}
         >
           <Ionicons name="cart-outline" size={16} color="white" />
           <Text style={styles.addToCartText}>Add to Cart</Text>

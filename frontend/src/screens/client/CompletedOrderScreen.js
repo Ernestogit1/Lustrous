@@ -178,14 +178,6 @@ const CompletedOrderScreen = ({ navigation }) => {
               {hasReview ? 'Update Your Review' : 'Write a Review'}
             </Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.reorderButton}
-            onPress={() => navigation.navigate('OrderDetails', { orderId: item._id })}
-          >
-            <Ionicons name="information-circle-outline" size={16} color={COLORS.darkPurple} />
-            <Text style={styles.reorderButtonText}>Order Details</Text>
-          </TouchableOpacity>
         </View>
       </View>
     );
