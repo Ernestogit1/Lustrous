@@ -9,6 +9,8 @@
   import { adminOrdersReducer } from '../reducers/orderAdmin.Reducers';
   import { reviewCreateReducer } from '../reducers/review.Reducers';
   import { notificationReducer, latestNotificationReducer } from '../reducers/notification.Reducers';
+  import { reviewCreateReducer, productReviewsReducer } from '../reducers/review.Reducers';
+
 
 
 
@@ -21,6 +23,7 @@
     changePassword: changePasswordReducer,
     reviewCreate: reviewCreateReducer,
     latestNotification: latestNotificationReducer,
+    productReviews: productReviewsReducer,
 
     // order:
     orderList: orderListReducer,
