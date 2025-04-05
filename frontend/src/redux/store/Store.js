@@ -7,7 +7,7 @@
   import { productCreateReducer, productListReducer  } from '../reducers/product.Reducers';
   import { cartReducer, cartListReducer, orderListReducer, singleOrderReducer  } from '../reducers/order.Reducers';
   import { adminOrdersReducer } from '../reducers/orderAdmin.Reducers';
-  import { reviewCreateReducer } from '../reducers/review.Reducers';
+  import { reviewCreateReducer, productReviewsReducer } from '../reducers/review.Reducers';
 
 
 
@@ -19,6 +19,7 @@
     userUpdate: userUpdateReducer,
     changePassword: changePasswordReducer,
     reviewCreate: reviewCreateReducer,
+    productReviews: productReviewsReducer,
 
     // order:
     orderList: orderListReducer,

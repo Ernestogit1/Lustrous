@@ -75,5 +75,62 @@ const createReview = async (req, res) => {
       return res.status(500).json({ message: 'Server error', error: error.message });
     }
   };
-  
-module.exports = { createReview, getUserReviewByOrder, updateReview };
+
+  const getProductReviews = async (req, res) => {
+    try {
+      const { productId } = req.params;
+      
+      console.log('[FETCH PRODUCT REVIEWS]', { productId });
+      
+      const orders = await Order.find({ 
+        'products.product': productId, 
+        status: 'Completed'
+      });
+      
+      if (!orders || orders.length === 0) {
+        console.log('[PRODUCT REVIEWS] No completed orders found for this product');
+        return res.status(200).json([]);
+      }
+      
+      const orderIds = orders.map(order => order._id);
+      console.log(`[PRODUCT REVIEWS] Found ${orderIds.length} orders for this product`);
+      
+      // Find all reviews for these orders
+      const reviews = await Review.find({ 
+        orderId: { $in: orderIds } 
+      }).populate({
+        path: 'userId',
+        select: 'name email profileImage'
+      });
+      const mappedReviews = await Promise.all(reviews.map(async (review) => {
+        const order = orders.find(o => o._id.toString() === review.orderId.toString());
+        
+        const orderProduct = order?.products.find(item => 
+          item.product.toString() === productId.toString()
+        );
+        
+        return {
+          _id: review._id,
+          rating: review.rating,
+          comment: review.comment,
+          createdAt: review.createdAt,
+          updatedAt: review.updatedAt,
+          user: {
+            _id: review.userId?._id,
+            name: review.userId?.name || 'Anonymous',
+            email: review.userId?.email,
+            profileImage: review.userId?.profileImage
+          },
+          productQuantity: orderProduct?.quantity || 1
+        };
+      }));
+      
+      console.log(`[PRODUCT REVIEWS] Found ${mappedReviews.length} reviews for product`);
+      return res.status(200).json(mappedReviews);
+    } catch (error) {
+      console.error('[PRODUCT REVIEWS ERROR]', error.message);
+      return res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  };
+
+module.exports = { createReview, getUserReviewByOrder, updateReview, getProductReviews };
