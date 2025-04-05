@@ -11,7 +11,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import * as SplashScreen from 'expo-splash-screen';
 import { Provider as PaperProvider } from 'react-native-paper';
 import { Provider, useSelector } from 'react-redux';
-import { createNativeStackNavigator } from '@react-navigation/native-stack'; // Correct import
+import { createNativeStackNavigator } from '@react-navigation/native-stack'; 
 import { configureGoogleSignIn } from './src/config/firebase';
 
 // helper
@@ -35,6 +35,7 @@ import EditProfileScreen from './src/screens/client/EditProfileScreen';
 import ProfileScreen from './src/screens/client/ProfileScreen';
 import EditPasswordScreen from './src/screens/client/EditPasswordScreen';
 import SingleOrderDetailScreen from './src/screens/client/SingleOrderDetailScreen';
+import writeReviewScreen from './src/screens/client/ReviewCreateScreen';
 
 // Admin screens
 import AdminSideBar from './src/components/AdminSideBar';
@@ -124,6 +125,14 @@ function UserNavigator() {
         options={{
           headerShown: true,
           headerTitle: "Order Detail"
+        }}
+      />
+      <UserStack.Screen
+        name="WriteReview"
+        component={writeReviewScreen}
+        options={{
+          headerShown: true,
+          headerTitle: "Write a Review"
         }}
       />
     </UserStack.Navigator>

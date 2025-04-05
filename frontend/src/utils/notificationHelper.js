@@ -66,7 +66,7 @@ export const registerPushNotifAsync = async () => {
 
     const tokenData = await Notifications.getExpoPushTokenAsync({
       projectId: Constants?.expoConfig?.extra?.eas?.projectId || '173e9d5f-2440-493d-9b69-29609317041d',
-    });
+    }); 
 
     if (!tokenData?.data) {
       console.warn('Expo push token not generated');
