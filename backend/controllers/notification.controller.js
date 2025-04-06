@@ -82,7 +82,7 @@ const fetchLatestNotification = async (req, res) => {
 
 const getAllNotifications = async (req, res) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id || req.user.userId;
     const notifs = await Notification.find({ userId })
       .sort({ createdAt: -1 })
       .populate('productId', 'name images price');
