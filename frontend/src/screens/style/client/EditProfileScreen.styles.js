@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   cameraIconContainer: {
     position: "absolute",
     bottom: -15,
-    right: 140,
+    right: 137,
     backgroundColor: COLORS.darkPurple,
     borderRadius: 20,
     padding: 8,
