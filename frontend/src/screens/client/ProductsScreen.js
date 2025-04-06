@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, TextInput } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, ActivityIndicator, TextInput, ScrollView, Animated } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllProducts } from '../../redux/actions/user.Actions';
 import { addToCart } from '../../redux/actions/order.Actions';
@@ -17,18 +17,37 @@ const ProductsScreen = ({ navigation }) => {
   const [filteredProducts, setFilteredProducts] = useState([]); 
   const [minPrice, setMinPrice] = useState(''); 
   const [maxPrice, setMaxPrice] = useState(''); 
-
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState({});
+  
+  const [isPriceDropdownOpen, setIsPriceDropdownOpen] = useState(false);
+  const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
+  
   useEffect(() => {
     if (isFocused) {
       dispatch(getAllProducts());
     }
   }, [isFocused, dispatch]);
 
-  // Filter products based on search query
+  useEffect(() => {
+    if (products && products.length > 0) {
+      const uniqueCategories = [...new Set(products
+        .filter(product => product.category)
+        .map(product => product.category))];
+      setCategories(uniqueCategories);
+      
+      const initialSelectedCategories = {};
+      uniqueCategories.forEach(category => {
+        initialSelectedCategories[category] = false;
+      });
+      setSelectedCategories(initialSelectedCategories);
+    }
+  }, [products]);
+
   useEffect(() => {
     if (!products) return;
 
-    let filtered = products;
+    let filtered = [...products];
 
     if (searchQuery.trim() !== '') {
       const lowerCaseQuery = searchQuery.toLowerCase();
@@ -40,27 +59,43 @@ const ProductsScreen = ({ navigation }) => {
       });
     }
 
+    if (minPrice !== '' || maxPrice !== '') {
+      const min = parseFloat(minPrice) || 0;
+      const max = parseFloat(maxPrice) || Infinity;
+      filtered = filtered.filter((product) => product.price >= min && product.price <= max);
+    }
+
+    const activeCategories = Object.keys(selectedCategories).filter(
+      category => selectedCategories[category]
+    );
+    
+    if (activeCategories.length > 0) {
+      filtered = filtered.filter(product => 
+        product.category && activeCategories.includes(product.category)
+      );
+    }
+
     setFilteredProducts(filtered);
-  }, [searchQuery, products]);
+  }, [searchQuery, minPrice, maxPrice, selectedCategories, products]);
 
-  const handlePriceFilter = () => {
-    if (!products) return;
-
-    const min = parseFloat(minPrice) || 0;
-    const max = parseFloat(maxPrice) || Infinity;
-
-    const filtered = products
-      .filter((product) => product.price >= min && product.price <= max)
-      .sort((a, b) => a.price - b.price); 
-
-    setFilteredProducts(filtered);
-  };
-
-
-  const handleClearFilter = () => {
+  const handleClearPriceFilter = () => {
     setMinPrice('');
     setMaxPrice('');
-    setFilteredProducts(products); 
+  };
+
+  const handleClearCategoryFilter = () => {
+    const clearedCategories = {...selectedCategories};
+    Object.keys(clearedCategories).forEach(key => {
+      clearedCategories[key] = false;
+    });
+    setSelectedCategories(clearedCategories);
+  };
+
+  const toggleCategory = (category) => {
+    setSelectedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
   };
 
   const renderProduct = ({ item }) => (
@@ -122,6 +157,23 @@ const ProductsScreen = ({ navigation }) => {
     </TouchableOpacity>
   );
 
+  const Checkbox = ({ checked, onPress, label }) => (
+    <TouchableOpacity 
+      style={styles.checkboxContainer} 
+      onPress={onPress}
+    >
+      <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+        {checked && (
+          <Ionicons name="checkmark" size={14} color={COLORS.white} />
+        )}
+      </View>
+      <Text style={styles.checkboxLabel}>{label}</Text>
+    </TouchableOpacity>
+  );
+
+  const activePriceFilter = minPrice !== '' || maxPrice !== '';
+  const activeCategoryFilters = Object.values(selectedCategories).filter(Boolean).length;
+
   return (
     <View style={styles.container}>
       {/* Search Bar Section */}
@@ -136,46 +188,117 @@ const ProductsScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Price Range Filter Section */}
-      <View style={styles.filterContainer}>
-        <Text style={styles.filterLabel}>Filter by Price Range:</Text>
-        <View style={styles.priceRangeContainer}>
-          <TextInput
-            style={styles.priceInput}
-            placeholder="Min"
-            placeholderTextColor={COLORS.gray}
-            keyboardType="numeric"
-            value={minPrice}
-            onChangeText={(text) => setMinPrice(text)}
-          />
-          <Text style={styles.priceRangeSeparator}>-</Text>
-          <TextInput
-            style={styles.priceInput}
-            placeholder="Max"
-            placeholderTextColor={COLORS.gray}
-            keyboardType="numeric"
-            value={maxPrice}
-            onChangeText={(text) => setMaxPrice(text)}
-          />
-          <TouchableOpacity
-            style={styles.filterButton}
-            onPress={handlePriceFilter}
-          >
-            <Text style={styles.filterButtonText}>Filter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.clearButton}
-            onPress={handleClearFilter}
-          >
-            <Text style={styles.clearButtonText}>Clear</Text>
-          </TouchableOpacity>
-        </View>
+      {/* Filters Container */}
+      <View style={styles.allFiltersContainer}>
+        {/* Price Range Filter Section */}
+        <TouchableOpacity 
+          style={styles.filterHeader}
+          onPress={() => setIsPriceDropdownOpen(!isPriceDropdownOpen)}
+        >
+          <View style={styles.filterHeaderLeft}>
+            <Text style={styles.filterLabel}>Filter by Price</Text>
+          </View>
+          <View style={styles.filterHeaderRight}>
+            {activePriceFilter > 0 && (
+              <TouchableOpacity 
+                style={styles.clearFilterButton} 
+                onPress={handleClearPriceFilter}
+              >
+                <Text style={styles.clearButtonText}>Clear</Text>
+              </TouchableOpacity>
+            )}
+            <Ionicons 
+              name={isPriceDropdownOpen ? "chevron-up" : "chevron-down"} 
+              size={20} 
+              color={COLORS.gray} 
+              style={styles.filterIcon}
+            />
+          </View>
+        </TouchableOpacity>
+
+        {isPriceDropdownOpen && (
+          <View style={styles.dropdownContent}>
+            <View style={styles.priceRangeContainer}>
+              <TextInput
+                style={styles.priceInput}
+                placeholder="Min"
+                placeholderTextColor={COLORS.gray}
+                keyboardType="numeric"
+                value={minPrice}
+                onChangeText={(text) => setMinPrice(text)}
+              />
+              <Text style={styles.priceRangeSeparator}>-</Text>
+              <TextInput
+                style={styles.priceInput}
+                placeholder="Max"
+                placeholderTextColor={COLORS.gray}
+                keyboardType="numeric"
+                value={maxPrice}
+                onChangeText={(text) => setMaxPrice(text)}
+              />
+            </View>
+          </View>
+        )}
+
+        {/* Category Filter Section */}
+        {categories.length > 0 && (
+          <>
+            <TouchableOpacity 
+              style={styles.filterHeader}
+              onPress={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
+            >
+              <View style={styles.filterHeaderLeft}>
+                <Text style={styles.filterLabel}>Filter by Category</Text>
+              </View>
+              <View style={styles.filterHeaderRight}>
+                {activeCategoryFilters > 0 && (
+                  <TouchableOpacity 
+                    style={styles.clearFilterButton} 
+                    onPress={handleClearCategoryFilter}
+                  >
+                    <Text style={styles.clearButtonText}>Clear</Text>
+                  </TouchableOpacity>
+                )}
+                <Ionicons 
+                  name={isCategoryDropdownOpen ? "chevron-up" : "chevron-down"} 
+                  size={20} 
+                  color={COLORS.gray} 
+                  style={styles.filterIcon}
+                />
+              </View>
+            </TouchableOpacity>
+
+            {isCategoryDropdownOpen && (
+              <View style={styles.dropdownContent}>
+                <ScrollView 
+                  style={styles.categoriesContainer}
+                  contentContainerStyle={styles.categoriesContentContainer}
+                >
+                  {categories.map((category, index) => (
+                    <Checkbox
+                      key={index}
+                      checked={selectedCategories[category]}
+                      onPress={() => toggleCategory(category)}
+                      label={category}
+                    />
+                  ))}
+                </ScrollView>
+              </View>
+            )}
+          </>
+        )}
       </View>
 
+      {/* Products List */}
       {loading ? (
         <ActivityIndicator size="large" color={COLORS.darkPurple} />
       ) : error ? (
         <Text style={styles.error}>{error}</Text>
+      ) : filteredProducts.length === 0 ? (
+        <View style={styles.noProductsContainer}>
+          <Ionicons name="search-outline" size={48} color={COLORS.gray} />
+          <Text style={styles.noProductsText}>No products match your filters</Text>
+        </View>
       ) : (
         <FlatList
           data={filteredProducts}

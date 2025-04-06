@@ -7,6 +7,7 @@ export const COLORS = {
   lightPink: "#F9F1FD",
   mediumPink: "#F2D7ED",
   gray: "#555",
+  textDark: "#333333",
   white: "#fff",
 };
 
@@ -19,38 +20,31 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: COLORS.white,
   },
-  filterContainer: {
-    marginBottom: 15,
-  },
-  filterLabel: {
-    fontSize: 16,
-    fontFamily: 'Poppins-Medium',
-    color: COLORS.gray,
-    marginBottom: 10,
-  },
-  filterButtons: {
+  searchBarContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  filterButton: {
-    flex: 1,
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 120,
-    backgroundColor: COLORS.lightPurple,
     alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 100,
+    paddingHorizontal: 10,
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  filterButtonActive: {
-    backgroundColor: COLORS.darkPurple,
+  searchIcon: {
+    marginRight: 10,
   },
-  filterButtonText: {
-    fontSize: 11,
+  searchInput: {
+    flex: 1,
+    height: 40,
+    fontSize: 14,
     fontFamily: 'Poppins-Regular',
     color: COLORS.gray,
   },
-  filterButtonTextActive: {
-    color: COLORS.white,
-  },
+  
+  // Products grid
   productsGrid: {
     paddingBottom: 20,
   },
@@ -80,6 +74,17 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  gridProductImagePlaceholder: {
+    width: '100%',
+    height: '100%',
+    backgroundColor: COLORS.lightPink,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  placeholderText: {
+    color: COLORS.gray,
+    fontFamily: 'Poppins-Regular',
+  },
   gridProductContent: {
     padding: 10,
   },
@@ -104,12 +109,17 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     borderRadius: 5,
   },
+  disabledAddToCartButton: {
+    backgroundColor: '#AAAAAA',
+    opacity: 0.8,
+  },
   addToCartText: {
     color: COLORS.white,
     fontSize: 14,
     fontFamily: 'Poppins-Regular',
     marginLeft: 5,
   },
+  
   error: {
     color: COLORS.gray,
     marginTop: 15,
@@ -117,86 +127,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Poppins-Regular',
   },
-  searchBarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 100,
-    paddingHorizontal: 10,
-    marginBottom: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  searchIcon: {
-    marginRight: 10,
-  },
-  searchInput: {
-    flex: 1,
-    height: 40,
-    fontSize: 14,
-    fontFamily: 'Poppins-Regular',
-    color: COLORS.gray,
-  },
-  filterContainer: {
-    marginBottom: 15,
-  },
-  filterLabel: {
-    fontSize: 16,
-    fontFamily: 'Poppins-Medium',
-    color: COLORS.gray,
-    marginBottom: 10,
-  },
-  priceRangeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  priceInput: {
-    flex: 1,
-    height: 40,
-    borderWidth: 1,
-    borderColor: COLORS.gray,
-    borderRadius: 5,
-    paddingHorizontal: 10,
-    fontSize: 14,
-    fontFamily: 'Poppins-Regular',
-    color: COLORS.gray,
-    marginHorizontal: 5,
-    height: 40,
-    width: 40,
-  },
-  priceRangeSeparator: {
-    fontSize: 16,
-    fontFamily: 'Poppins-Medium',
-    color: COLORS.gray,
-  },
-  filterButton: {
-    backgroundColor: COLORS.darkPurple,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    height: 40,
-  },
-  filterButtonText: {
-    color: COLORS.white,
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-  },
-  clearButton: {
-    backgroundColor: COLORS.lightPurple, 
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 5,
-    height: 40,
-    marginLeft: 10, 
-  },
-  clearButtonText: {
-    color: COLORS.darkPurple, 
-    fontSize: 14,
-    fontFamily: 'Poppins-Medium',
-  },
+  
   outOfStockOverlay: {
     position: 'absolute',
     top: 0,
@@ -220,9 +151,143 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   
-  disabledAddToCartButton: {
-    backgroundColor: '#AAAAAA',
-    opacity: 0.8,
+  allFiltersContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: 10,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  
+  filterHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  
+  filterHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  filterHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  filterLabel: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Medium',
+    color: COLORS.darkPurple,
+  },
+  
+  filterIcon: {
+    marginLeft: 8,
+  },
+  
+  dropdownContent: {
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  
+  clearFilterButton: {
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 4,
+    backgroundColor: COLORS.lightPurple,
+  },
+  
+  clearButtonText: {
+    fontSize: 12,
+    fontFamily: 'Poppins-Medium',
+    color: COLORS.darkPurple,
+  },
+  
+  priceRangeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
+  priceInput: {
+    flex: 1,
+    height: 40,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 6,
+    paddingHorizontal: 12,
+    fontFamily: 'Poppins-Regular',
+    fontSize: 14,
+    color: COLORS.gray,
+  },
+  
+  priceRangeSeparator: {
+    marginHorizontal: 10,
+    fontSize: 16,
+    color: COLORS.gray,
+  },
+  
+  categoriesContainer: {
+    maxHeight: 180,
+  },
+  
+  categoriesContentContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '50%',
+    marginBottom: 12,
+  },
+  
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: COLORS.gray,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 8,
+    backgroundColor: COLORS.white,
+  },
+  
+  checkboxChecked: {
+    backgroundColor: COLORS.darkPurple,
+    borderColor: COLORS.darkPurple,
+  },
+  
+  checkboxLabel: {
+    fontSize: 14,
+    fontFamily: 'Poppins-Regular',
+    color: COLORS.textDark,
+    flex: 1,
+  },
+  
+  // No products state
+  noProductsContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  
+  noProductsText: {
+    marginTop: 12,
+    fontSize: 16,
+    fontFamily: 'Poppins-Regular',
+    color: COLORS.gray,
+    textAlign: 'center',
   },
 });
 
