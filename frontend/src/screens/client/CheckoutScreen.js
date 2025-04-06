@@ -102,11 +102,15 @@ export default function CheckoutScreen({ navigation }) {
 
       {/* Action Button */}
       <View style={styles.buttonContainer}>
-        <TouchableOpacity
+      <TouchableOpacity
           style={styles.checkoutButton}
           onPress={() => {
             dispatch(checkoutOrder(() => {
-              navigation.navigate('UserDrawer', { screen: 'Cart' });
+              // Navigate back with transaction complete parameter
+              navigation.navigate('UserDrawer', { 
+                screen: 'Home',  // Assuming 'Home' is your UserScreen
+                params: { transactionComplete: true }
+              });
             }));
           }}
         >

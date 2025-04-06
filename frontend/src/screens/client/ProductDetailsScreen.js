@@ -13,6 +13,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/actions/order.Actions'; 
 import { fetchProductReviews } from '../../redux/actions/review.Actions';
+import Toast from "react-native-toast-message";
 
 const ProductDetailsScreen = ({ route }) => {
   const { product } = route.params;
@@ -108,6 +109,14 @@ const ProductDetailsScreen = ({ route }) => {
   const handleAddToCart = () => {
     if (userInfo?._id) {
       dispatch(addToCart(product._id));
+      Toast.show({
+        type: 'success',
+        text1: 'Added to cart!',
+        text2: `${product.name} has been added to your cart`,
+        visibilityTime: 2000,
+        position: 'top',
+        topOffset: 50
+      });
     }
   };
 
@@ -304,7 +313,7 @@ const ProductDetailsScreen = ({ route }) => {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          
+
           <View style={styles.sortContainer}>
             <Text style={styles.sortLabel}>Sort by: </Text>
             <TouchableOpacity 

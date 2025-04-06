@@ -9,7 +9,8 @@ import { getAllProducts } from "../../redux/actions/user.Actions";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { addToCart } from "../../redux/actions/order.Actions"; 
-import { useIsFocused } from '@react-navigation/native';
+import { useIsFocused, useRoute } from '@react-navigation/native';
+import Toast from "react-native-toast-message";
 
 import styles, { COLORS } from "../style/client/UserScreen.styles";
 
@@ -22,7 +23,8 @@ const carouselImages = [
 
 const UserScreen = ({ navigation }) => {
   const dispatch = useDispatch();
-
+  const route = useRoute();
+  const [transactionComplete, setTransactionComplete] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("All"); 
   const [searchQuery, setSearchQuery] = useState(""); 
   const [filteredProducts, setFilteredProducts] = useState([]); 
@@ -32,6 +34,54 @@ const UserScreen = ({ navigation }) => {
 
   const userInfo = useSelector((state) => state.userLogin?.userInfo);
   const { loading, error, products } = useSelector((state) => state.productDetails);
+
+  const [isFirstVisit, setIsFirstVisit] = useState(true);
+  const [showedToast, setShowedToast] = useState(false);
+
+
+  useEffect(() => {
+    if (isFocused) {
+      // Check for transaction complete params
+      const hasCompletedTransaction = route.params?.transactionComplete;
+      
+      if (hasCompletedTransaction) {
+        // Show transaction complete toast
+        Toast.show({
+          type: 'success',
+          text1: 'Transaction Complete! 🎉',
+          text2: 'Your order has been placed successfully',
+          visibilityTime: 3000,
+          position: 'top',
+          topOffset: 100
+        });
+        
+        // Clear the navigation params
+        navigation.setParams({ transactionComplete: undefined });
+        
+        // Mark that we showed a toast so welcome toast doesn't show
+        setShowedToast(true);
+      } 
+
+      else if (isFirstVisit && !showedToast && userInfo) {
+        Toast.show({
+          type: 'success',
+          text1: 'Welcome back 🎉',
+          visibilityTime: 3000,
+          position: 'top',
+          topOffset: 60
+        });
+        
+        // Mark that we've shown the welcome toast
+        setIsFirstVisit(false);
+        setShowedToast(true);
+      }
+    }
+    
+    // Reset toast flag when screen loses focus
+    if (!isFocused) {
+      setShowedToast(false);
+    }
+  }, [isFocused, route.params, userInfo]);
 
   // Fetch products on component mount
   useEffect(() => {
@@ -184,18 +234,27 @@ const UserScreen = ({ navigation }) => {
                   <Text style={styles.gridProductName} numberOfLines={1}>{product.name}</Text>
                   <Text style={styles.gridProductPrice}>₱{product.price}</Text>
                   
-              <TouchableOpacity
-                style={[
-                  styles.addToCartButton,
-                  product.stock <= 0 && styles.disabledAddToCartButton
-                ]}
-                onPress={() => {
-                  if (userInfo?._id && product.stock > 0) {
-                    dispatch(addToCart(product._id));
-                  }
-                }}
-                disabled={product.stock <= 0}
-              >
+                  <TouchableOpacity
+                    style={[
+                      styles.addToCartButton,
+                      product.stock <= 0 && styles.disabledAddToCartButton
+                    ]}
+                    onPress={() => {
+                      if (userInfo?._id && product.stock > 0) {
+                        dispatch(addToCart(product._id));
+                        // Display toast notification at the top of screen
+                        Toast.show({
+                          type: 'success',
+                          text1: 'Added to cart!',
+                          text2: `${product.name} has been added to your cart`,
+                          visibilityTime: 2000,
+                          position: 'side',
+                          topOffset: 100
+                        });
+                      }
+                    }}
+                    disabled={product.stock <= 0}
+                  >
                 <Ionicons 
                   name="cart-outline"  
                   size={16} 

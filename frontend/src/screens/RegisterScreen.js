@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -18,18 +18,31 @@ import { Camera } from "expo-camera";
 import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import Toast from "react-native-toast-message";
 import styles, { COLORS } from "./style/RegisterScreen.styles";
+
+// Validation schema with required address
+const RegisterSchema = Yup.object().shape({
+  name: Yup.string().required("Name is required"),
+  email: Yup.string().email("Invalid email").required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  phoneNumber: Yup.string()
+    .matches(/^[0-9]+$/, "Phone number must contain only digits")
+    .min(10, "Phone number is too short")
+    .required("Phone number is required"),
+  address: Yup.string().required("Address is required") // Changed to required
+});
 
 const RegisterScreen = () => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { loading, error, success } = useSelector((state) => state.userRegister)
+  const { loading, error, success } = useSelector((state) => state.userRegister);
+  const formikRef = useRef(null);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [address, setAddress] = useState("");
   const [avatar, setAvatar] = useState(null);
   const [cameraPermission, setCameraPermission] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -47,13 +60,25 @@ const RegisterScreen = () => {
     })();
   }, []);
 
-
+  // Handle success message and navigation
   useEffect(() => {
     if (success) {
-      Alert.alert("Success", "Registration successful! You can now log in.");
-      navigation.navigate("Login"); // 🔥 Redirect to LoginScreen
+  
+      navigation.navigate("Login", { fromRegister: true });
     }
-  }, [success]);
+  }, [success, navigation]);
+
+  // Handle error message
+  useEffect(() => {
+    if (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Registration Failed',
+        text2: error,
+        visibilityTime: 3000,
+      });
+    }
+  }, [error]);
 
   // Function to open camera and take photo
   const takePhoto = async () => {
@@ -74,7 +99,11 @@ const RegisterScreen = () => {
         setAvatar(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to take photo.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to take photo',
+      });
     }
   };
 
@@ -92,23 +121,22 @@ const RegisterScreen = () => {
         setAvatar(result.assets[0].uri);
       }
     } catch (error) {
-      Alert.alert("Error", "Failed to select image.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to select image',
+      });
     }
   };
 
   // Function to handle registration
-  const handleRegister = async () => {
-    if (!name || !email || !password || !phoneNumber) {
-      Alert.alert("Error", "Please fill in all required fields.");
-      return;
-    }
-
+  const handleRegister = async (values) => {
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
-    formData.append("password", password);
-    formData.append("phoneNumber", phoneNumber);
-    formData.append("address", address);
+    formData.append("name", values.name);
+    formData.append("email", values.email);
+    formData.append("password", values.password);
+    formData.append("phoneNumber", values.phoneNumber);
+    formData.append("address", values.address);
 
     if (avatar) {
       const filename = avatar.split("/").pop();
@@ -164,79 +192,160 @@ const RegisterScreen = () => {
             </TouchableOpacity>
             <Text style={styles.avatarHelperText}>Tap to upload profile photo</Text>
 
-            {/* Input Fields with Icons */}
-            <View style={styles.inputContainer}>
-              <Ionicons name="person-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Full Name" 
-                value={name} 
-                onChangeText={setName} 
-                style={styles.input} 
-              />
-            </View>
-            
-            <View style={styles.inputContainer}>
-              <Ionicons name="mail-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Email Address" 
-                keyboardType="email-address" 
-                value={email} 
-                onChangeText={setEmail} 
-                style={styles.input} 
-                autoCapitalize="none"
-              />
-            </View>
-            
-            <View style={styles.inputContainer}>
-              <Ionicons name="lock-closed-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Password" 
-                secureTextEntry={!showPassword} 
-                value={password} 
-                onChangeText={setPassword} 
-                style={styles.input} 
-              />
-              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-                <Ionicons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={20}
-                  color="#999"
-                />
-              </TouchableOpacity>
-            </View>
-            
-            <View style={styles.inputContainer}>
-              <Ionicons name="call-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Phone Number" 
-                keyboardType="phone-pad" 
-                value={phoneNumber} 
-                onChangeText={setPhoneNumber} 
-                style={styles.input} 
-              />
-            </View>
-            
-            <View style={styles.inputContainer}>
-              <Ionicons name="home-outline" size={20} color={COLORS.darkPurple} style={styles.inputIcon} />
-              <TextInput 
-                placeholder="Address" 
-                value={address} 
-                onChangeText={setAddress} 
-                style={[styles.input, styles.addressInput]} 
-              />
-            </View>
+            <Formik
+              initialValues={{
+                name: "",
+                email: "",
+                password: "",
+                phoneNumber: "",
+                address: ""
+              }}
+              validationSchema={RegisterSchema}
+              onSubmit={handleRegister}
+              innerRef={formikRef}
+              validateOnBlur={true}
+              validateOnChange={false}
+            >
+              {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+                <>
+                  {/* Input Fields with Icons */}
+                  <View style={[
+                    styles.inputContainer,
+                    touched.name && errors.name && styles.inputError
+                  ]}>
+                    <Ionicons 
+                      name="person-outline" 
+                      size={20} 
+                      color={touched.name && errors.name ? '#FF3B30' : COLORS.darkPurple} 
+                      style={styles.inputIcon} 
+                    />
+                    <TextInput 
+                      placeholder="Full Name" 
+                      value={values.name} 
+                      onChangeText={handleChange('name')} 
+                      onBlur={handleBlur('name')}
+                      style={styles.input} 
+                      placeholderTextColor={touched.name && errors.name ? '#FF3B30' : '#999'}
+                    />
+                  </View>
+                  {touched.name && errors.name && (
+                    <Text style={styles.errorText}>{errors.name}</Text>
+                  )}
+                  
+                  <View style={[
+                    styles.inputContainer,
+                    touched.email && errors.email && styles.inputError
+                  ]}>
+                    <Ionicons 
+                      name="mail-outline" 
+                      size={20} 
+                      color={touched.email && errors.email ? '#FF3B30' : COLORS.darkPurple} 
+                      style={styles.inputIcon} 
+                    />
+                    <TextInput 
+                      placeholder="Email Address" 
+                      keyboardType="email-address" 
+                      value={values.email} 
+                      onChangeText={handleChange('email')} 
+                      onBlur={handleBlur('email')}
+                      style={styles.input} 
+                      autoCapitalize="none"
+                      placeholderTextColor={touched.email && errors.email ? '#FF3B30' : '#999'}
+                    />
+                  </View>
+                  {touched.email && errors.email && (
+                    <Text style={styles.errorText}>{errors.email}</Text>
+                  )}
+                  
+                  <View style={[
+                    styles.inputContainer,
+                    touched.password && errors.password && styles.inputError
+                  ]}>
+                    <Ionicons 
+                      name="lock-closed-outline" 
+                      size={20} 
+                      color={touched.password && errors.password ? '#FF3B30' : COLORS.darkPurple} 
+                      style={styles.inputIcon} 
+                    />
+                    <TextInput 
+                      placeholder="Password" 
+                      secureTextEntry={!showPassword} 
+                      value={values.password} 
+                      onChangeText={handleChange('password')} 
+                      onBlur={handleBlur('password')}
+                      style={styles.input} 
+                      placeholderTextColor={touched.password && errors.password ? '#FF3B30' : '#999'}
+                    />
+                    <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                      <Ionicons
+                        name={showPassword ? "eye-off-outline" : "eye-outline"}
+                        size={20}
+                        color={touched.password && errors.password ? '#FF3B30' : '#999'}
+                      />
+                    </TouchableOpacity>
+                  </View>
+                  {touched.password && errors.password && (
+                    <Text style={styles.errorText}>{errors.password}</Text>
+                  )}
+                  
+                  <View style={[
+                    styles.inputContainer,
+                    touched.phoneNumber && errors.phoneNumber && styles.inputError
+                  ]}>
+                    <Ionicons 
+                      name="call-outline" 
+                      size={20} 
+                      color={touched.phoneNumber && errors.phoneNumber ? '#FF3B30' : COLORS.darkPurple} 
+                      style={styles.inputIcon} 
+                    />
+                    <TextInput 
+                      placeholder="Phone Number" 
+                      keyboardType="phone-pad" 
+                      value={values.phoneNumber} 
+                      onChangeText={handleChange('phoneNumber')} 
+                      onBlur={handleBlur('phoneNumber')}
+                      style={styles.input} 
+                      placeholderTextColor={touched.phoneNumber && errors.phoneNumber ? '#FF3B30' : '#999'}
+                    />
+                  </View>
+                  {touched.phoneNumber && errors.phoneNumber && (
+                    <Text style={styles.errorText}>{errors.phoneNumber}</Text>
+                  )}
+                  
+                  <View style={[
+                    styles.inputContainer,
+                    touched.address && errors.address && styles.inputError
+                  ]}>
+                    <Ionicons 
+                      name="home-outline" 
+                      size={20} 
+                      color={touched.address && errors.address ? '#FF3B30' : COLORS.darkPurple} 
+                      style={styles.inputIcon} 
+                    />
+                    <TextInput 
+                      placeholder="Address" 
+                      value={values.address} 
+                      onChangeText={handleChange('address')} 
+                      onBlur={handleBlur('address')}
+                      style={[styles.input, styles.addressInput]} 
+                      placeholderTextColor={touched.address && errors.address ? '#FF3B30' : '#999'}
+                    />
+                  </View>
+                  {touched.address && errors.address && (
+                    <Text style={styles.errorText}>{errors.address}</Text>
+                  )}
 
-            {/* Error Handling */}
-            {error && <Text style={styles.errorText}>{error}</Text>}
-
-            {/* Register Button */}
-            <TouchableOpacity onPress={handleRegister} style={styles.button} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={styles.buttonText}>Create Account</Text>
+                  {/* Register Button */}
+                  <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={loading}>
+                    {loading ? (
+                      <ActivityIndicator color="#fff" />
+                    ) : (
+                      <Text style={styles.buttonText}>Create Account</Text>
+                    )}
+                  </TouchableOpacity>
+                </>
               )}
-            </TouchableOpacity>
+            </Formik>
 
             {/* Divider */}
             <View style={styles.divider}>
@@ -255,6 +364,8 @@ const RegisterScreen = () => {
           </View>
         </ScrollView>
       </LinearGradient>
+
+      <Toast />
     </KeyboardAvoidingView>
   );
 };

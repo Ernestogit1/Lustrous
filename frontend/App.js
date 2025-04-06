@@ -14,9 +14,13 @@ import { Provider, useSelector } from 'react-redux';
 import { createNativeStackNavigator } from '@react-navigation/native-stack'; 
 import { configureGoogleSignIn } from './src/config/firebase';
 
+
 // helper
 import { setupNotificationListener, removeNotificationListener } from './src/utils/notificationHelper';
 
+
+// Toast
+import Toast, { BaseToast, ErrorToast } from 'react-native-toast-message';
 
 
 // Store
@@ -44,7 +48,28 @@ import displayNotificationScreen from './src/screens/client/NotificationDisplayS
 import AdminSideBar from './src/components/AdminSideBar';
 
 
-
+const toastConfig = {
+  success: (props) => (
+    <BaseToast
+      {...props}
+      style={{ borderLeftColor: '#9370DB' }}
+      contentContainerStyle={{ paddingHorizontal: 15 }}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '600'
+      }}
+    />
+  ),
+  error: (props) => (
+    <ErrorToast
+      {...props}
+      text1Style={{
+        fontSize: 15,
+        fontWeight: '600'
+      }}
+    />
+  ),
+};
 
 // Prevent the splash screen from auto-hiding
 SplashScreen.preventAutoHideAsync();
@@ -219,6 +244,7 @@ export default function App() {
       <PaperProvider>
         <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
           <MainNavigator />
+          <Toast config={toastConfig} /> 
         </SafeAreaView>
       </PaperProvider>
     </Provider>
