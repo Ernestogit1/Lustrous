@@ -10,7 +10,7 @@ router.post("/login", loginUser);
 router.get("/me", authMiddleware, getUserProfile);
 router.post("/google-login", googleLoginUser); 
 router.put("/update", authMiddleware, upload.single("avatar"), updateUserProfile);
-router.post("/change-password", authMiddleware, changePassword); // Change password route
+router.post("/change-password", authMiddleware, changePassword); 
 
 router.put('/update-push-token', authMiddleware, updatePushToken);
 

@@ -34,10 +34,10 @@ const addToCart = async (req, res) => {
   
       await cartItem.save();
   
-      // ✅ Populate full product details before sending to frontend
+      
       await cartItem.populate('product', 'name price images stock');
   
-      res.status(200).json({ success: true, cartItem }); // ✅ frontend will save to SQLite
+      res.status(200).json({ success: true, cartItem }); 
     } catch (err) {
       res.status(500).json({
         success: false,
@@ -51,8 +51,8 @@ const addToCart = async (req, res) => {
   const updateCartQuantity = async (req, res) => {
     try {
       const userId = req.user?.userId || req.user?._id;
-      const { id } = req.params; // cartItemId
-      const { type } = req.body; // 'increase' or 'decrease'
+      const { id } = req.params; 
+      const { type } = req.body; 
   
       const cartItem = await Cart.findOne({ _id: id, user: userId }).populate('product');
       if (!cartItem) return res.status(404).json({ message: 'Cart item not found' });
@@ -159,7 +159,6 @@ const removeFromCart = async (req, res) => {
   
       await order.save();
   
-      // Only remove the ordered items from cart
       const orderedIds = products.map(p => p.product);
       await Cart.deleteMany({ user: userId, product: { $in: orderedIds } });
   

@@ -13,17 +13,17 @@ const ProductSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
-    min: 0, // Ensures price is not negative
+    min: 0, 
   },
   description: {
     type: String,
     required: true,
-    maxlength: 1000, // Limits description length to 1000 characters
+    maxlength: 1000, 
   },
   stock: {
     type: Number,
     required: true,
-    min: 0, // Prevents negative stock values
+    min: 0,
   },
   images: [
     {
@@ -37,6 +37,8 @@ const ProductSchema = new mongoose.Schema({
     default: false,
   },
   
-}, { timestamps: true });
+}, { 
+  timestamps: true
+ });
 
 module.exports = mongoose.model('Product', ProductSchema);

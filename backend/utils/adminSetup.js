@@ -12,7 +12,7 @@ const createAdminUser = async () => {
 
     console.log("🚀 No admin found. Creating an admin account...");
 
-    // ✅ Check if Firebase already has this admin email
+    //  Check existing Firebase  admin email
     let userRecord;
     try {
       userRecord = await admin.auth().getUserByEmail("admin@gmail.com");
@@ -20,9 +20,9 @@ const createAdminUser = async () => {
       if (error.code === "auth/user-not-found") {
         console.log("🔹 Admin does not exist in Firebase. Creating new Firebase user...");
         userRecord = await admin.auth().createUser({
-          email: "admin@gmail.com",
-          password: "admin123", // This will be stored in Firebase
-          displayName: "Admin",
+          email: "admin@gmail.com",// } ====
+          password: "admin123",  //        || => Store in firebase
+          displayName: "Admin",// } ========
         });
       } else {
         console.error("🔥 Firebase error:", error);
@@ -30,17 +30,17 @@ const createAdminUser = async () => {
       }
     }
 
-    // ✅ Create new admin user in MongoDB with valid values
+    // if no admin exist in MongoDB, create one
     const newAdmin = new User({
-      name: "Admin",
-      email: "admin@gmail.com",
-      firebaseUid: userRecord.uid,
-      password: "firebase-manage", // Stored like other users
-      phoneNumber: "999999", // ✅ Required value
-      address: "Not Provided", // ✅ Avoids validation error
-      avatar: "default-avatar.png", // ✅ Default avatar (or empty string "")
-      isAdmin: true,
-      fcmToken: "",
+      name: "Admin",//==============================||
+      email: "admin@gmail.com",//                   ||
+      firebaseUid: userRecord.uid,//                || 
+      password: "firebase-manage", //               ||      
+      phoneNumber: "999999", //                     ||======> Sotre in MongoDB   
+      address: "Not Provided", //                   ||   
+      avatar: "default-avatar.png", //              ||   
+      isAdmin: true,//                              || 
+      fcmToken: "",//===============================||
     });
 
     await newAdmin.save();

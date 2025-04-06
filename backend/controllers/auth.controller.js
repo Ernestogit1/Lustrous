@@ -11,7 +11,6 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "All required fields must be filled" });
     }
 
-    // Create user in Firebase
     const userRecord = await admin.auth().createUser({
       email,
       password,
@@ -30,11 +29,11 @@ const registerUser = async (req, res) => {
       name,
       email,
       firebaseUid: userRecord.uid,
-      password: "firebase-manage", // Firebase handles the password
+      password: "firebase-manage", 
       phoneNumber,
       address,
       avatar: avatarUrl,
-      isAdmin: false, // All new users are not admins by default
+      isAdmin: false, 
     });
 
     await newUser.save();
@@ -148,7 +147,7 @@ const googleLoginUser = async (req, res) => {
 
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select("-password"); // Exclude password
+    const user = await User.findById(req.user.userId).select("-password"); 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -180,7 +179,7 @@ const updateUserProfile = async (req, res) => {
     } else {
       if (name) user.name = name;
       if (email && email !== user.email) {
-        // Check if the email is already in use
+        
         const emailExists = await User.findOne({ email });
         if (emailExists) {
           return res.status(400).json({ message: "Email is already in use" });
@@ -200,7 +199,7 @@ const updateUserProfile = async (req, res) => {
 
     if (req.file) {
       try {
-        // Delete the old avatar from Cloudinary if it exists
+        
         if (user.avatar) {
           const publicId = user.avatar.split("/").pop().split(".")[0];
           await cloudinary.uploader.destroy(publicId);
@@ -238,7 +237,7 @@ const updateUserProfile = async (req, res) => {
 
 const changePassword = async (req, res) => {
   try {
-    const userId = req.user.userId; // Extract user ID from the authenticated request
+    const userId = req.user.userId; 
     const { currentPassword, newPassword } = req.body;
 
     if (!currentPassword || !newPassword) {
@@ -251,11 +250,11 @@ const changePassword = async (req, res) => {
       return res.status(404).json({ message: "User not found." });
     }
 
-    // Verify the current password using Firebase
+    
     try {
       const firebaseUser = await admin.auth().getUser(user.firebaseUid);
 
-      // Reauthenticate the user using their email and current password
+      
       const email = firebaseUser.email;
       const signInResult = await admin.auth().verifyIdToken(req.headers.authorization.split(" ")[1]);
 
@@ -263,7 +262,6 @@ const changePassword = async (req, res) => {
         return res.status(401).json({ message: "Invalid current password." });
       }
 
-      // Update the password in Firebase
       await admin.auth().updateUser(user.firebaseUid, { password: newPassword });
     } catch (error) {
       console.error("Firebase Password Update Error:", error);

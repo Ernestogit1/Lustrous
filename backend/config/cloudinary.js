@@ -13,18 +13,20 @@ cloudinary.config({
 });
 
 // Configure Multer Storage to Upload Directly to Cloudinary
+// product folder
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'products', // Ensure images are stored in the 'products' folder
+    folder: 'products', 
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
   },
 });
 
+// acatar folder
 const avatarStorage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: 'avatars', // Ensure images are stored in the 'avatars' folder
+    folder: 'avatars', 
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
   },
 });

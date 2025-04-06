@@ -34,22 +34,22 @@ const createReview = async (req, res) => {
   };
   const getUserReviewByOrder = async (req, res) => {
     try {
-      const userId = req.user.userId || req.user._id; // Ensure user is attached
+      const userId = req.user.userId || req.user._id; 
       const { orderId } = req.params;
   
-      console.log('Fetching review for:', { userId, orderId }); // Debugging log
+      console.log('Fetching review for:', { userId, orderId }); 
   
-      // Query the Review model
+      
       const review = await Review.findOne({ userId, orderId });
       if (!review) {
-        console.log('No review found for this order'); // Debugging log
+        console.log('No review found for this order'); 
         return res.status(404).json({ message: 'No review found for this order' });
       }
   
-      console.log('Review found:', review); // Debugging log
+      console.log('Review found:', review); 
       res.status(200).json({ review });
     } catch (error) {
-      console.error('Error fetching review:', error.message); // Debugging log
+      console.error('Error fetching review:', error.message); 
       res.status(500).json({ message: 'Error fetching review', error: error.message });
     }
   };
@@ -95,7 +95,6 @@ const createReview = async (req, res) => {
       const orderIds = orders.map(order => order._id);
       console.log(`[PRODUCT REVIEWS] Found ${orderIds.length} orders for this product`);
       
-      // Find all reviews for these orders
       const reviews = await Review.find({ 
         orderId: { $in: orderIds } 
       }).populate({

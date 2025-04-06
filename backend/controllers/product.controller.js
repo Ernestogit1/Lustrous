@@ -21,10 +21,9 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ message: "You can only upload up to 5 images" });
     }
 
-    // ✅ req.files already contains secure_url and public_id
     const imageUrls = req.files.map(file => ({
-      public_id: file.filename, // filename is public_id
-      url: file.path            // path is the Cloudinary secure_url
+      public_id: file.filename, 
+      url: file.path           
     }));
 
     const newProduct = new Product({
@@ -58,7 +57,7 @@ const updateProduct = async (req, res) => {
     product.description = description || product.description;
     product.stock = stock ?? product.stock;
 
-    // If images are uploaded, delete old ones from cloudinary
+   
     if (req.files && req.files.length > 0) {
       for (const img of product.images) {
         await cloudinary.uploader.destroy(img.public_id);
@@ -144,7 +143,7 @@ const permanentDeleteProduct = async (req, res) => {
   }
 };
 
-// test
+
 const listTrashedProducts = async (req, res) => {
   try {
     const products = await Product.find({ deleted: true }).sort('-createdAt');

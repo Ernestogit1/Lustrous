@@ -8,16 +8,27 @@ const OrderSchema = new mongoose.Schema({
   },
   products: [
     {
-      product: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
-      quantity: { type: Number, required: true },
+      product: {
+         type: mongoose.Schema.Types.ObjectId, 
+         ref: 'Product'
+         },
+      quantity: { 
+        type: Number, 
+        required: true 
+      },
     },
   ],
-  totalAmount: { type: Number, required: true },
+  totalAmount: { 
+    type: Number,
+     required: true 
+    },
   status: {
     type: String,
     enum: ['Order Placed', 'Shipped', 'Completed', 'Cancelled'],
     default: 'Order Placed',
   },
-}, { timestamps: true });
+}, { 
+  timestamps: true 
+});
 
 module.exports = mongoose.model('Order', OrderSchema);
