@@ -45,23 +45,6 @@ export const createNotification = (productId, title, body, newPrice) => async (d
 };
 
 
-export const fetchLatestNotification = () => async (dispatch) => {
-  try {
-    console.log('📡 Fetching latest notification...');
-    
-    const token = await getToken();
-    const { data } = await axios.get(`${API_URL}/api/notifications/latest`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    console.log('➡️ Response:', data); // ✅ after request
-
-    dispatch({ type: NOTIF_FETCH_SUCCESS, payload: data.notification });
-  } catch (err) {
-    console.error('❌ Fetch error:', err.response?.data || err.message); // ⛔ optional
-    dispatch({ type: NOTIF_FETCH_FAIL, payload: err.response?.data?.message || err.message });
-  }
-};
 
 
 export const fetchAllNotifications = () => async (dispatch) => {
@@ -74,5 +57,20 @@ export const fetchAllNotifications = () => async (dispatch) => {
     dispatch({ type: NOTIF_LIST_SUCCESS, payload: data.notifications });
   } catch (err) {
     dispatch({ type: NOTIF_LIST_FAIL, payload: err.response?.data?.message || err.message });
+  }
+};
+export const fetchNotificationById = (id) => async (dispatch) => {
+  try {
+    const token = await getToken();
+    const { data } = await axios.get(`${API_URL}/api/notifications/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    dispatch({ type: NOTIF_FETCH_SUCCESS, payload: data.notification });
+  } catch (err) {
+    dispatch({
+      type: NOTIF_FETCH_FAIL,
+      payload: err.response?.data?.message || err.message,
+    });
   }
 };

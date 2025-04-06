@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { View, Text, ScrollView, SafeAreaView, Dimensions, StyleSheet } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchLatestNotification } from '../../redux/actions/notification.Actions';
+import { fetchNotificationById  } from '../../redux/actions/notification.Actions';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import styles, { COLORS } from '../../screens/style/client/SingleNotificationScreen.Style';
@@ -13,8 +13,11 @@ const SingleNotificationScreen = ({ route }) => {
   const { notification } = useSelector((state) => state.latestNotification);
   const { notificationId } = route.params || {};
 
+
   useEffect(() => {
-    dispatch(fetchLatestNotification(notificationId));
+    if (notificationId) {
+      dispatch(fetchNotificationById(notificationId));
+    }
   }, [dispatch, notificationId]);
 
   const getNotificationIcon = (type) => {

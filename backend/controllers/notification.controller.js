@@ -64,20 +64,7 @@ const createNotification = async (req, res) => {
     res.status(500).json({ message: 'Failed to send notifications' });
   }
 };
-const fetchLatestNotification = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const notif = await Notification.findOne({ userId }).sort({ createdAt: -1 }).populate('productId');
 
-    if (!notif) {
-      return res.status(404).json({ message: 'No notifications found' });
-    }
-
-    res.status(200).json({ notification: notif });
-  } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
-  }
-};
 
 
 const getAllNotifications = async (req, res) => {
@@ -93,8 +80,26 @@ const getAllNotifications = async (req, res) => {
   }
 };
 
+const getNotificationById = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.userId;
+    const { id } = req.params;
+
+    const notification = await Notification.findOne({ _id: id, userId }).populate('productId');
+
+    if (!notification) {
+      return res.status(404).json({ message: 'Notification not found' });
+    }
+
+    res.status(200).json({ notification });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to fetch notification', error: err.message });
+  }
+};
+
+
 module.exports = {
   createNotification,
-  fetchLatestNotification,
   getAllNotifications,
+  getNotificationById,
 };
