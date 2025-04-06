@@ -70,6 +70,7 @@ export const fetchAllNotifications = () => async (dispatch) => {
     const { data } = await axios.get(`${API_URL}/api/notifications/all`, {
       headers: { Authorization: `Bearer ${token}` }
     });
+
     dispatch({ type: NOTIF_LIST_SUCCESS, payload: data.notifications });
   } catch (err) {
     dispatch({ type: NOTIF_LIST_FAIL, payload: err.response?.data?.message || err.message });

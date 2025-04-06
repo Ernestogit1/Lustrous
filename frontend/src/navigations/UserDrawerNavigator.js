@@ -8,7 +8,7 @@ import CartScreen from "../screens/client/CartScreen";
 import ProductsScreen from "../screens/client/ProductsScreen";
 import UserDrawer from "../components/UserDrawer";
 import OrderTabs from '../navigations/OrderTabs';
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch  } from "react-redux";
 
 import { COLORS } from "../screens/style/client/UserDrawer.styles";
 
@@ -49,16 +49,26 @@ const UserDrawerNavigator = () => {
   const cartItemCount = cartItems.length;
 
   const HeaderRight = ({ navigation }) => {
+    const dispatch = useDispatch(); 
+
+    const notificationState = useSelector(state => state.notificationList);
+    const unreadCount = notificationState.unreadCount || 0;
+
+    
+  const handleOpenNotifications = () => {
+    dispatch({ type: 'NOTIF_MARK_ALL_READ' }); // 👈 Reset count on click
+    navigation.navigate('Notification');
+  };
     return (
       <View style={styles.headerRightContainer}>
         {/* Notification Icon */}
         <TouchableOpacity 
           style={styles.headerIcon}
-          onPress={() => navigation.navigate('Notification')}
+          onPress={handleOpenNotifications} 
         >
           <Ionicons name="notifications-outline" size={24} color={COLORS.darkPurple} />
-          <NotificationBadge count={0} />
-        </TouchableOpacity>
+          <NotificationBadge count={unreadCount} />
+          </TouchableOpacity>
                 
         {/* Cart Icon */}
         <TouchableOpacity 

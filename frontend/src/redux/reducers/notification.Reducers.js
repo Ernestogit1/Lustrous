@@ -6,6 +6,7 @@ import {
     NOTIF_FETCH_FAIL,
     NOTIF_LIST_SUCCESS,
     NOTIF_LIST_FAIL,
+    NOTIF_RESET_UNREAD_COUNT
   } from '../constants/notification.Constants';
   
   export const notificationReducer = (state = {}, action) => {
@@ -31,18 +32,32 @@ import {
         return state;
     }
   };
-  export const notificationListReducer = (state = { notifications: [] }, action) => {
-    switch (action.type) {
-      case NOTIF_LIST_SUCCESS:
-        return {
-          ...state,
-          notifications: Array.isArray(action.payload) ? action.payload : [],
-        };
-      case NOTIF_LIST_FAIL:
-        return { ...state, error: action.payload };
-      default:
-        return state;
-    }
-  };
+export const notificationListReducer = (
+  state = { notifications: [], unreadCount: 0 },
+  action
+) => {
+  switch (action.type) {
+    case NOTIF_LIST_SUCCESS:
+      return {
+        ...state,
+        notifications: Array.isArray(action.payload) ? action.payload : [],
+        unreadCount: Array.isArray(action.payload) ? action.payload.length : 0,
+      };
+
+    case NOTIF_RESET_UNREAD_COUNT:
+      return {
+        ...state,
+        unreadCount: 0,
+      };
+
+    case NOTIF_LIST_FAIL:
+      return { ...state, error: action.payload };
+
+    default:
+      return state;
+  }
+};
+
+  
   
   

@@ -160,7 +160,7 @@ function UserNavigator() {
         component={displayNotificationScreen}
         options={{
           headerShown: true,
-          headerTitle: ""
+          headerTitle: "Notifications"
         }}
       />
     </UserStack.Navigator>
