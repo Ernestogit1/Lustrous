@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { useDispatch } from "react-redux";
 import { logoutUser } from "../redux/actions/auth.Actions";
@@ -35,9 +35,15 @@ const CustomDrawerContent = (props) => {
   return (
     <View style={styles.drawerContainer}>
       <View style={styles.drawerHeader}>
-        <Text style={styles.drawerTitle}>Lustrous Admin</Text>
+        <Image 
+          source={require('../../assets/lustrous.png')} 
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
       </View>
-      {props.children}
+      <View style={styles.drawerItemsContainer}>
+        {props.children}
+      </View>
     </View>
   );
 };
@@ -76,6 +82,8 @@ export default function AdminSideBar() {
                   return <Ionicons name="close-circle" size={22} color={color} />;
                 case 'DeliveredOrders':
                   return <Ionicons name="checkmark-circle" size={22} color={color} />;
+                case 'Notification':
+                  return <Ionicons name="notifications" size={22} color={color} />;
                 case 'Logout':
                   return <Ionicons name="log-out" size={22} color={color} />;
                 default:
@@ -92,6 +100,8 @@ export default function AdminSideBar() {
                   return 'Cancelled Orders';
                 case 'DeliveredOrders':
                   return 'Completed Orders';
+                case 'Notification':
+                  return 'Create Discount/Promotion';
                 default:
                   return routeName;
               }
