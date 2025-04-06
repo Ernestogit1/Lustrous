@@ -25,12 +25,24 @@ const styles = StyleSheet.create({
   },
   drawerContainer: {
     flex: 1,
+    backgroundColor: COLORS.white,
   },
   drawerHeader: {
-    backgroundColor: COLORS.darkPurple,
-    paddingVertical: 30,
-    paddingHorizontal: 16,
-    marginBottom: 10,
+    paddingTop: 50, 
+    paddingBottom: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0,0,0,0.1)',
+    backgroundColor: COLORS.white, 
+  },
+  logoImage: {
+    width: 170,  
+    height: 70,  
+  },
+  drawerItemsContainer: {
+    flex: 1,
+    paddingTop: 20, 
   },
   drawerTitle: {
     fontSize: 22,
@@ -60,7 +72,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   drawerItemActive: {
-    backgroundColor: COLORS.lightPink,
+    backgroundColor: 'rgba(107, 63, 160, 0.1)', 
   },
   drawerItemText: {
     marginLeft: 16,
@@ -86,8 +98,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins-SemiBold',
     fontSize: 18,
   },
-
-  // Logout screen styles
   logoutContainer: {
     flex: 1,
     justifyContent: 'center',
