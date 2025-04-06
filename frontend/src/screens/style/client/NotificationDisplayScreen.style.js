@@ -17,12 +17,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    fontFamily: 'Poppins-Medium',
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',
+    fontFamily: 'Poppins-Medium',
   },
   listContainer: {
     padding: 16,
@@ -51,6 +52,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 16,
     alignItems: 'center',
+    fontFamily: 'Poppins-Regular',
   },
   iconContainer: {
     width: 40,
@@ -75,12 +77,14 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   title: { 
-    fontWeight: '600', 
     fontSize: 15,
     flex: 1,
+    fontFamily: 'Poppins-Bold',
   },
   readTitle: {
     color: '#666',
+    fontFamily: 'Poppins-Regular',
+    
   },
   unreadTitle: {
     color: '#222',
@@ -91,11 +95,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     lineHeight: 20,
+    fontFamily: 'Poppins-Regular',
   },
   date: { 
     color: '#999', 
     fontSize: 12,
     marginLeft: 8,
+    fontFamily: 'Poppins-Regular',
   },
   unreadDot: {
     position: 'absolute',
