@@ -2,7 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Text, View, ScrollView, TouchableOpacity, 
   SafeAreaView, ImageBackground, Image, 
-  Animated, FlatList, ActivityIndicator 
+  Animated, FlatList, ActivityIndicator,
+  TextInput 
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
@@ -20,8 +21,10 @@ const HomeScreen = () => {
 
   // Local state
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [searchQuery, setSearchQuery] = useState('');
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const flatListRef = useRef(null);
 
@@ -33,7 +36,7 @@ const HomeScreen = () => {
     dispatch(fetchHomeProducts());
   }, [dispatch]);
 
-  // Update displayed products when allProducts or selectedCategory changes
+  // Apply category filtering
   useEffect(() => {
     if (selectedCategory === null || selectedCategory === 'All') {
       setProducts(allProducts);
@@ -46,6 +49,22 @@ const HomeScreen = () => {
       setProducts(filtered);
     }
   }, [allProducts, selectedCategory]);
+
+  // Apply search filter
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredProducts(products);
+    } else {
+      const lowerCaseQuery = searchQuery.toLowerCase();
+      const filtered = products.filter((product) => {
+        const matchesName = product.name.toLowerCase().includes(lowerCaseQuery);
+        const matchesCategory = product.category?.toLowerCase().includes(lowerCaseQuery);
+        const matchesPrice = product.price.toString().includes(lowerCaseQuery);
+        return matchesName || matchesCategory || matchesPrice;
+      });
+      setFilteredProducts(filtered);
+    }
+  }, [searchQuery, products]);
 
   // Handle category selection
   const handleCategorySelect = (category) => {
@@ -155,6 +174,18 @@ const HomeScreen = () => {
           </View>
         </View>
 
+        {/* Search Bar */}
+        <View style={styles.searchBarContainer}>
+          <Ionicons name="search" size={20} color={COLORS.gray} style={styles.searchIcon} />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search by name, category, or price"
+            placeholderTextColor={COLORS.gray}
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
+        </View>
+
         <View style={styles.heroSection}>
           <FlatList
             ref={flatListRef}
@@ -203,7 +234,7 @@ const HomeScreen = () => {
         <View style={styles.sectionContainer}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>
-              {'New Arrival'}
+              {searchQuery ? 'Search Results' : 'New Arrival'}
             </Text>
           </View>
           
@@ -213,8 +244,8 @@ const HomeScreen = () => {
             <Text style={styles.errorText}>{error}</Text>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.productScroll}>
-              {products && products.length > 0 ? (
-                products.map((product) => (
+              {filteredProducts && filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
                   <TouchableOpacity 
                     key={product._id} 
                     style={styles.productCard}
@@ -261,9 +292,20 @@ const HomeScreen = () => {
                   </TouchableOpacity>
                 ))
               ) : (
-                <Text style={styles.noProductsText}>
-                  {selectedCategory ? `No ${selectedCategory} products found` : 'No products available'}
-                </Text>
+                <View style={styles.noProductsContainer}>
+                  {searchQuery ? (
+                    <>
+                      <Ionicons name="search-outline" size={36} color={COLORS.gray} />
+                      <Text style={styles.noProductsText}>
+                        No products match your search
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={styles.noProductsText}>
+                      {selectedCategory ? `No ${selectedCategory} products found` : 'No products available'}
+                    </Text>
+                  )}
+                </View>
               )}
             </ScrollView>
           )}
@@ -296,8 +338,6 @@ const HomeScreen = () => {
             </View>
           </View>
         </View>
-
-   
 
         {/* Call-to-Action Section */}
         <View style={styles.ctaSection}>

@@ -7,6 +7,8 @@ const COLORS = {
   mediumPink: '#E1AFD1',
   lightPurple: '#AD88C6',
   darkPurple: '#7469B6',
+  white: '#FFFFFF',
+  gray: '#555',
 };
 
 export { COLORS };
@@ -23,17 +25,19 @@ export default StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 15,       
     paddingHorizontal: 20,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.lightPink,
+    marginTop: 30,
+    backgroundColor: COLORS.lightPink,
   },
   headerLeft: {
     justifyContent: 'center',
   },
   headerLogo: {
     width: 120,
-    height: 85,
+    height: 30,
   },
   headerRight: {
     flexDirection: 'row',
@@ -475,4 +479,49 @@ export default StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Poppins-Regular',
   },
+  // Add these styles for the search bar
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    borderRadius: 100,
+    paddingHorizontal: 10,
+    marginHorizontal: 20,
+    marginTop: 15,        // Add space between navbar and search bar
+    marginBottom: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+searchIcon: {
+  marginRight: 10,
+},
+
+searchInput: {
+  flex: 1,
+  height: 40,
+  fontSize: 14,
+  fontFamily: 'Poppins-Regular',
+  color: COLORS.gray,
+},
+
+// Improved no products styling
+noProductsContainer: {
+  width: '100%',
+  paddingHorizontal: 20,
+  paddingVertical: 30,
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+noProductsText: {
+  marginTop: 10,
+  fontSize: 16,
+  fontFamily: 'Poppins-Regular',
+  color: COLORS.gray,
+  textAlign: 'center',
+},
 });
