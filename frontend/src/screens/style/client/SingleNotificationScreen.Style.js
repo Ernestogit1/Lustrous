@@ -103,9 +103,9 @@ const styles = StyleSheet.create({
   },
   headerTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     color: '#FFFFFF',
     textAlign: 'center',
+    fontFamily: 'Poppins-Medium',
   },
   contentScrollView: {
     flex: 1,
@@ -150,18 +150,19 @@ const styles = StyleSheet.create({
   },
   title: { 
     fontSize: 20, 
-    fontWeight: 'bold',
     color: '#222',
     textAlign: 'center',
     textShadowColor: 'rgba(0, 0, 0, 0.05)',
     textShadowOffset: {width: 0, height: 1},
     textShadowRadius: 2,
+    fontFamily: 'Poppins-Medium',
   },
   time: { 
     marginTop: 6,
     fontSize: 14, 
     color: '#777',
     textAlign: 'center',
+    fontFamily: 'Poppins-Regular',
   },
   divider: {
     height: 2,
@@ -181,6 +182,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderLeftWidth: 3,
     borderLeftColor: COLORS.darkPurple,
+    fontFamily: 'Poppins-Regular',
   },
   dataContainer: {
     marginTop: 16,
@@ -196,10 +198,12 @@ const styles = StyleSheet.create({
     padding: 4,
     borderBottomWidth: 1, 
     borderBottomColor: `${COLORS.lightPink}30`,
+    fontFamily: 'Poppins-Regular',
   },
   dataLabel: {
     fontWeight: '600',
     color: '#444',
+    fontFamily: 'Poppins-Medium',
   },
   emptyContainer: {
     flex: 1,
