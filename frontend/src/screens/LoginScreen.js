@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Image } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser } from "../redux/actions/auth.Actions";
+import { loginUser, googleLogin } from "../redux/actions/auth.Actions";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -80,6 +80,7 @@ const LoginScreen = () => {
           text2: 'You can now log in to your account',
           visibilityTime: 3000,
         });
+        
       }, 300);
       
       navigation.setParams({ fromRegister: undefined });
@@ -89,6 +90,11 @@ const LoginScreen = () => {
   const handleSubmit = (values) => {
     setAuthError(false);
     dispatch(loginUser(values.email, values.password));
+  };
+
+  // Handle Google sign-in
+  const handleGoogleSignIn = () => {
+    dispatch(googleLogin());
   };
 
   return (
@@ -180,6 +186,16 @@ const LoginScreen = () => {
                 {(touched.password && errors.password) && (
                   <Text style={styles.errorText}>{errors.password}</Text>
                 )}
+              {/* google login */}
+            <TouchableOpacity onPress={handleGoogleSignIn} style={styles.googleButton}>
+            <View style={styles.googleButtonContent}>
+              <Image
+                source={require("../../assets/google-logo.png")}
+                style={styles.googleLogo}
+              />
+              <Text style={styles.googleButtonText}>Sign In with Google</Text>
+            </View>
+          </TouchableOpacity>
 
                 {/* Login Button */}
                 <TouchableOpacity onPress={handleSubmit} style={styles.button} disabled={loading}>
@@ -193,7 +209,23 @@ const LoginScreen = () => {
             )}
           </Formik>
 
-          {/* Rest of your component... */}
+          {/* Divider */}
+          <View style={styles.divider}>
+            <View style={styles.dividerLine} />
+            <Text style={styles.dividerText}>OR</Text>
+            <View style={styles.dividerLine} />
+          </View>
+
+      
+
+          {/* Register Link */}
+          <View style={styles.registerLinkContainer}>
+            <Text style={styles.registerText}>Don't have an account?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+              <Text style={styles.registerLink}>Create Account</Text>
+            </TouchableOpacity>
+          </View>
+          
         </ScrollView>
       </LinearGradient>
       
