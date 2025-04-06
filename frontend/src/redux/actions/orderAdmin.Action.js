@@ -73,7 +73,7 @@ export const getAdminOrders = () => async (dispatch) => {
   
   export const updateOrderStatus = (orderId, status) => async (dispatch) => {
     try {
-      const token = await getToken(); // ✅ get token from SQLite
+      const token = await getToken(); 
       if (!token) throw new Error('No token found in SQLite');
   
       const config = {

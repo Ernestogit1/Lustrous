@@ -23,7 +23,7 @@ export const productDetailsReducer = (state = { products: {} }, action) => {
   }
 };
 
-// Reducer for updating user profile
+
 export const userUpdateReducer = (state = {}, action) => {
   switch (action.type) {
     case USER_UPDATE_REQUEST:

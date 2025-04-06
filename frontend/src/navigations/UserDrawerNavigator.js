@@ -26,7 +26,7 @@ const NotificationBadge = ({ count }) => {
   );
 };
 
-// Simple empty dropdown component
+
 const EmptyDropdown = ({ visible, onClose }) => {
   if (!visible) return null;
   
@@ -56,7 +56,7 @@ const UserDrawerNavigator = () => {
 
     
   const handleOpenNotifications = () => {
-    dispatch({ type: 'NOTIF_MARK_ALL_READ' }); // 👈 Reset count on click
+    dispatch({ type: 'NOTIF_MARK_ALL_READ' });
     navigation.navigate('Notification');
   };
     return (

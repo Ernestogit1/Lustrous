@@ -14,7 +14,7 @@ import {
 import {
   USER_LOGIN_SUCCESS
 } from "../constants/auth.Constants";
-import { getToken } from "../../utils/sqliteHelper"; // Assuming you have a utility function to get the token
+import { getToken } from "../../utils/sqliteHelper"; 
 
 export const getAllProducts = () => async (dispatch) => {
   try {
@@ -103,7 +103,7 @@ export const changePassword = (currentPassword, newPassword) => async (dispatch)
   try {
     dispatch({ type: USER_CHANGE_PASSWORD_REQUEST });
 
-    const token = await getToken(); // Retrieve the token
+    const token = await getToken(); 
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -111,7 +111,6 @@ export const changePassword = (currentPassword, newPassword) => async (dispatch)
       },
     };
 
-    // Make the API call to change the password
     const { data } = await axios.put(
       `${API_URL}/api/auth/change-password`,
       { currentPassword, newPassword },
@@ -120,10 +119,10 @@ export const changePassword = (currentPassword, newPassword) => async (dispatch)
 
     dispatch({
       type: USER_CHANGE_PASSWORD_SUCCESS,
-      payload: data.message, // Success message from the backend
+      payload: data.message, 
     });
 
-    // Log the user out after password change
+    
     dispatch(logout());
   } catch (error) {
     dispatch({

@@ -23,7 +23,7 @@ import {
    deleteCartItemSQLite,
        
    clearCartSQLite        
-} from "../../utils/sqliteHelper"; // ✅ adjust if path differs
+} from "../../utils/sqliteHelper"; 
 
 export const addToCart = (productId) => async (dispatch) => {
   try {
@@ -38,7 +38,7 @@ export const addToCart = (productId) => async (dispatch) => {
 
     dispatch({ type: ADD_TO_CART_SUCCESS, payload: data.cartItem });
     await upsertCartItemSQLite(data.cartItem); 
-    dispatch(getCartItemsFromSQLite()); // ✅ Refresh cart from SQLite
+    dispatch(getCartItemsFromSQLite()); 
     // dispatch(getCartItems());
   } catch (error) {
     const message = error.response?.data?.message || error.message;
@@ -89,8 +89,8 @@ export const removeFromCart = (cartItemId) => async (dispatch) => {
 
     await axios.delete(`${API_URL}/api/orders/cart/${cartItemId}`, config);
     await deleteCartItemSQLite(cartItemId);
-    dispatch(getCartItemsFromSQLite()); // ✅ Refresh from SQLite only
-    // dispatch(getCartItems()); // refresh cart
+    dispatch(getCartItemsFromSQLite()); 
+    // dispatch(getCartItems()); 
   } catch (error) {
     console.error('Remove from cart error:', error.message);
   }
@@ -101,16 +101,16 @@ export const updateCartQuantity = (cartItemId, type) => async (dispatch) => {
     const token = await getToken();
     const config = { headers: { Authorization: `Bearer ${token}` } };
 
-    // ✅ Update quantity in MongoDB
+    
     const { data } = await axios.put(`${API_URL}/api/orders/cart/${cartItemId}`, { type }, config);
 
-    // ✅ Save updated item to SQLite
+    
     const updatedItem = data.cartItem;
     if (updatedItem) {
       await upsertCartItemSQLite(updatedItem);
     }
 
-    // ✅ Refresh cart from local SQLite DB
+    
     dispatch(getCartItemsFromSQLite());
   } catch (error) {
     console.error('Update quantity failed:', error.response?.data?.message || error.message);

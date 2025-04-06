@@ -74,7 +74,7 @@ export const createReview = (orderId, rating, comment) => async (dispatch) => {
         }
       );
   
-      return data; // you can dispatch if you want to set updateReview state
+      return data; 
     } catch (error) {
       throw new Error(error.response?.data?.message || error.message);
     }

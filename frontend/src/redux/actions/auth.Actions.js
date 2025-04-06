@@ -23,7 +23,7 @@ import { API_URL } from "@env";
 
 export const initializeDatabase = () => async (dispatch) => {
   try {
-    await initDB(); // Initialize the SQLite database
+    await initDB(); 
   } catch (error) {
     console.error("SQLite Initialization Error:", error);
   }

@@ -9,8 +9,8 @@ const Tab = createMaterialTopTabNavigator();
 const OrderTabs = () => (
   <Tab.Navigator
     screenOptions={{
-      lazy: true, // ensures only active screen renders
-      swipeEnabled: true, // enable proper swipe gestures
+      lazy: true, 
+      swipeEnabled: true, 
       tabBarLabelStyle: { fontSize: 15, fontFamily: 'Poppins-SemiBold' },
       tabBarIndicatorStyle: { backgroundColor: '#6200ee', height: 3 },
       tabBarActiveTintColor: '#6200ee',

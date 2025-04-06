@@ -3,15 +3,16 @@ const User = require('../models/user.model');
 
 const expirePushTokens = async () => {
   try {
+    // one min
     // const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
-
+    // 24 hours
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-
+    // 24 hours
     const expiredUsers = await User.find({
         pushToken: { $ne: '' },
         updatedAt: { $lt: twentyFourHoursAgo }, 
       });
-
+      // one min
     // const expiredUsers = await User.find({
     //   pushToken: { $ne: '' },
     //   updatedAt: { $lt: oneMinuteAgo }, 
@@ -33,5 +34,7 @@ const expirePushTokens = async () => {
 const startPushTokenCleaner = () => {
   setInterval(expirePushTokens, 60 * 1000);
 };
+
+
 
 module.exports = { startPushTokenCleaner };

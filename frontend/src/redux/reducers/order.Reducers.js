@@ -12,7 +12,7 @@ import {
   SINGLE_ORDER_SUCCESS,
   SINGLE_ORDER_FAIL,
 } from '../constants/order.Constants';
-// test
+
 export const cartReducer = (state = { items: [], loading: false }, action) => {
   switch (action.type) {
     case ADD_TO_CART_REQUEST:

@@ -23,14 +23,14 @@ const UserDrawer = (props) => {
       dispatch(loadUser());       // only run once per drawer open
       dispatch(getCartItems());
     }
-  }, [isFocused]); // ✅ only run on drawer focus
+  }, [isFocused]); // only run on drawer focus
   
   useEffect(() => {
     if (userInfo) {
       setAvatar(userInfo.avatar || null);
       setName(userInfo.name || "User");
     }
-  }, [userInfo]); // ✅ run only when userInfo changes
+  }, [userInfo]); // run only when userInfo changes
 
   const handleLogout = () => {
     dispatch(logoutUser());
